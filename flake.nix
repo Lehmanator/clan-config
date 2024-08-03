@@ -7,110 +7,106 @@
 
   outputs = { self, clan-core, nuenv, ... }@inputs: let
     system = "x86_64-linux";
-    # pkgs = clan-core.inputs.nixpkgs.legacyPackages.${system}.appendOverlays [
-    #   nuenv.overlays.nuenv
-    # ];
-    pkgs = import clan-core.inputs.nixpkgs {
-      inherit system;
-      overlays = [nuenv.overlays.default];
-    };
+    pkgs = import clan-core.inputs.nixpkgs { inherit system; overlays = [nuenv.overlays.default]; };
     
     # Usage see: https://docs.clan.lol
     clan = clan-core.lib.buildClan {
       meta = {
-        name = "Lehmanator"; # Ensure this is internet wide unique.
+        name = "Lehmanator";
         description = "My personal machines";
-        # icon = "";
+        # icon = "https://github.com/Lehmanator/Lehmanator/blob/main/assets/images/profile.png";
       };
       directory = self;
-      specialArgs = {
-        user = "sam";
-      };
+      specialArgs = { user = "sam"; inherit inputs; };
 
-      # Prerequisite: boot into the installer
+      # Pre-requisite: boot into the installer
       # See: https://docs.clan.lol/getting-started/installer
       # local> mkdir -p ./machines/machine1
       # local> Edit ./machines/machine1/configuration.nix to your liking
-      machines = let
-        user = "sam";
-      in {
-        fw = let
-          host = "fw";
-        in {
-          imports = [
-            ./modules/shared.nix
-            ./machines/${host}/configuration.nix
-          ];
-          clanCore = {
-            machineDescription = "Framework Laptop";
-            machineName = "fw";
-            # machineIcon = "";
-            # tags = ["laptop" "gnome"];
-            facts = {
-              publicDirectory = null;
-              secretPathFunction = null;
-            };
-          };
-
-          clan.networking = {
-            buildHost  = pkgs.lib.mkDefault "${user}@${host}"; #:port  # SSH node where nixos-rebuild will be executed.
-            targetHost = pkgs.lib.mkDefault "${user}@${host}"; #:port  # SSH node where the result of nixos-rebuild will be deployed.
-
-            # Zerotier needs one controller to accept new nodes. Once accepted
-            # the controller can be offline and routing still works.
-            zerotier.controller.enable = true;
-          };
-
-          disko.devices.disk.main.device = "/dev/disk/by-id/nvme-WD_BLACK_SN770_2TB_22382X803513";
-          nixpkgs.hostPlatform = system;
-          users.users.root.openssh.authorizedKeys.keys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB2M80EUw0wQaBNutE06VNgSViVot6RL0O6iv2P1ewWH ${user}@${host}"
-            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCo3Q3odpbDCcOxKeiqE5YX4sWmSGynXz3Nog0IuQbPfj8/4bCaeQMPMYggu7Txj9Q935teDi0C6mLkeprn5Q0vsZwglX/lAXaMEv3QgnzPzIxple0Ns7buyaIP38JNAHCd6qNMpLXsWU1CrKkX9qOY3CSzb127xMY9IemW2GzIUD8v3SCrmUoEJg3cqZJ3zK21V3SbSyAwf1EJT/jfggksC7gSMOmvkFPJ/8E1L/J7l/+yplS+4cmFoznbVgIyp49Vl6SGE+jay4yc/BAxzmx+x3tPn4zLeZVRswmx6sRZZXY+U+jKeZ5/0HFETtz87rW4cXW95531wpsVufu8M8eqvdOGVIR1a3HYaM82I7Enm95lKXuyoijwYlsVQP+DTWHtzpXNHZekSQjpmlR31pHyF/h7nON2DzCwcdrz+NOvXmQgighXvuwWVF0MmZCHJDJYS4P/RDG2HKztuqxiH5dxYCWyVIcYuS2awHXb+zhOFPi+UvhezgJPMU1gX+djXZGorN87HditBLfFmMckmT1MCU0jzenn4boPE25j5TXRCRCXTI9TMFOgzOS87amE/w8cUFK2WQiIa60SLkNdHy8k4W0aQfjGxEL9ijsB+JKpzgKFOv0EKIBYY8Z4i822RvZ9L7WCDK0BQe0jmkwp0ZUDnST2XY3NMqprVZNHFWKz7w== ${user}@${host}"
-          ];
-        };
-
+      # machines = rec { default = fw; defaultVM = ?;
+      machines = {
         # "wyse" will be the hostname of the machine
-        wyse = {
-          imports = [
-            ./modules/shared.nix
-            ./machines/wyse/configuration.nix
-          ];
-          nixpkgs.hostPlatform = system;
-
-          # Set this for clan commands use ssh i.e. `clan machines update`
-          # If you change the hostname, you need to update this line to root@<new-hostname>
-          # This only works however if you have avahi running on your admin machine else use IP
-          clan.networking.targetHost = pkgs.lib.mkDefault "root@wyse";
-
-          # TODO: Combine LVM, LUKS, BTRFS, interactive login, impermanence
-          # - https://github.com/nix-community/disko/blob/master/example/luks-btrfs-subvolumes.nix
-          # - https://github.com/nix-community/disko/blob/master/example/luks-interactive-login.nix
-          # - https://github.com/nix-community/disko/blob/master/example/luks-lvm.nix
-          # ssh root@flash-installer.local lsblk --output NAME,ID-LINK,FSTYPE,SIZE,MOUNTPOINT
-          disko.devices.disk.main = {
-            device = "/dev/disk/by-id/__CHANGE_ME__";
+        wyse = { imports = [ ./modules/shared.nix ./machines/wyse/configuration.nix ]; };
+        fw = {
+          imports = [ ./modules/shared.nix ./machines/fw/configuration.nix ];
+          clan.core = {
+            deployment.requireExplicitUpdate = false;
+            # machineDescription = "Framework Laptop";
+            # machineName = "fw";
+            # machineIcon = ./machines/${host}/icon.svg;
+            # state = {}; # State directories to backup & restore
+            # tags = ["laptop" "gnome"];
+            # facts = {
+            #   publicStore = "in_repo";    # in_repo | vm | custom
+            #   publicDirectory    = null;  # Dir where public facts are stored
+            #   secretPathFunction = null;  # Function to use to generate path for a decret.
+            #   secretStore = "sops"; # sops | password-store | vm | custom
+            #   secretUploadDirectory = null; # Dir where secrets are uploaded into. This is backend-specific.
+            #   services.example = {
+            #     name = "example";
+            #     generator = {path=[]; prompt="Text for user prompt"; script = "myscript.sh"; };
+            #     # Public facts to generate for this service
+            #     public.factName = {
+            #       name = "example";
+            #       path = "${config.clan.core.clanDir}/machines/${config.clan.core.machineName}/facts/${fact.config.name}";
+            #       value = "${config.clan.core.clanDir}/${fact.config.path}";
+            #     }; 
+            #     secret.factName = {
+            #       name = "example";
+            #       path = "/no-such-path";
+            #       groups = [];
+            #     }; 
+            #   };
+            # };
           };
+        };
+      };
 
-          # IMPORTANT! Add your SSH key here
-          # e.g. > cat ~/.ssh/id_ed25519.pub
-          users.users.root.openssh.authorizedKeys.keys = throw ''
-            Don't forget to add your SSH key here!
-            users.users.root.openssh.authorizedKeys.keys = [ "<YOUR SSH_KEY>" ]
-          '';
-
-          /*
-            After fw is deployed, uncomment the following line
-            This will allow wyse to share the VPN overlay network with fw
-            The networkId is generated by the first deployment of fw
-          */
-          # clan.networking.zerotier.networkId = builtins.readFile ../fw/facts/zerotier-network-id;
+      # https://docs.clan.lol/reference/nix-api/inventory/
+      inventory = {
+        machines = {
+          fw = {
+            name = "fw";
+            description = "Framework Laptop 13";
+            icon = "./machines/fw/icon.svg";
+            tags = ["backup"];
+            system = "x86_64-linux";
+          };
+          wyse = {
+            name = "wyse";
+            description = "Dell Wyse Mini Desktop";
+            icon = "./machines/wyse/icon.svg";
+            tags = ["backup"];
+            system = "x86_64-linux";
+          };
+          aio = {
+            name = "aio";
+            description = "Dell Inspiron All-in-One Desktop";
+            icon = "./machines/aio/icon.svg";
+            tags = ["backup"];
+            system = "x86_64-linux";
+          };
+        };
+        services = {
+          # borgbackup.instance_1 = {
+          #   roles.server.machines = ["wyse"];
+          #   roles.server.tags = ["backup-server"];
+          #   roles.client.tags = ["backup"];
+          # };
         };
       };
     };
   in {
     # all machines managed by Clan
-    inherit (clan) nixosConfigurations clanInternals;
+    inherit (clan) clanInternals;
     inherit inputs pkgs;
+
+    nixosConfigurations = clan.nixosConfigurations // {
+      # Inherit installer config from upstream clan-core.
+      # TODO: Auto-add SSH keys from other machines.
+      inherit (inputs.clan-core.nixosConfigurations) flash-installer;
+    };
+
     # add the Clan CLI tool to the dev shell
     devShells.${system}.default = pkgs.mkShell {
       packages = [ 
@@ -121,7 +117,7 @@
     packages.${system} = {
       inherit (clan-core.packages.${system}) clan-app clan-cli clan-cli-docs clan-ts-api editor module-docs module-schema webview-ui;
       clan-installer-instructions = pkgs.callPackage ./packages/installer-instructions.nix {};
-      clan-flash = pkgs.callPackage ./packages/flasher.nix {
+      clan-flash                  = pkgs.callPackage ./packages/flasher.nix {
         inherit (clan-core.packages.${system}) clan-cli;
         clan-input-path = inputs.clan-core.outPath;
       };

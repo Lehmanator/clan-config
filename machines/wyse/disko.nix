@@ -1,5 +1,7 @@
 { lib, ... }: 
 let
+  inherit (lib) mkDefault mkIf;
+
   # How many GB of RAM the machine has.
   # TODO: Obtain from system RAM
   ram = 32;
@@ -54,12 +56,13 @@ in
               extraOpenArgs = [];
               # if you want to use the key for interactive login be sure there is no trailing newline
               # for example use `echo -n "password" > /tmp/secret.key`
-              passwordFile = lib.mkIf interactive "/tmp/secret.key";
+              # passwordFile = mkIf interactive "/tmp/secret.key";
+              # passwordFile = config.sops.secrets.fw-user-password.path;
               settings = {
-                keyFile = lib.mkIf (! interactive) "/tmp/secret.key";
+                # keyFile = mkIf (! interactive) "/tmp/secret.key";
                 allowDiscards = true;
               };
-              additionalKeyFiles = ["/tmp/additionalSecret.key"];
+              # additionalKeyFiles = ["/tmp/additionalSecret.key"];
               content = {
                 type = "lvm_pv";
                 vg = "pool";
@@ -90,6 +93,7 @@ in
           size = "256G";
           content = {
             type = "filesystem";
+            format = "ext4";
             mountpoint = "/var";
             mountOptions = ["defaults"];
           };
@@ -128,7 +132,7 @@ in
     nodev.${if tmpfs then "/" else "/tmp"} = {
       fsType = "tmpfs";
       mountOptions = [
-        "size=${ram / 8}G"
+        "size=${builtins.toString (ram / 8)}G"
         "defaults"
         "mode=755"
       ];
@@ -139,8 +143,8 @@ in
 
   # TODO: Handle XBOOTLDR
   boot.loader.grub = {
-    efiSupport = lib.mkDefault true;
-    efiInstallAsRemovable = lib.mkDefault true;
+    efiSupport            = mkDefault true;
+    efiInstallAsRemovable = mkDefault true;
   };
 
   services = {
