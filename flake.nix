@@ -115,7 +115,7 @@
     devShells.${system}.default = pkgs.mkShell {
       packages = [ 
         clan-core.packages.${system}.clan-cli
-        self.packages.${system}.clan-flash-installer
+        self.packages.${system}.clan-flash
       ];
     };
     packages.${system} = {
