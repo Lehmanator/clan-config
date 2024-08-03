@@ -27,6 +27,7 @@
       machines = {
         # "wyse" will be the hostname of the machine
         wyse = { imports = [ ./modules/shared.nix ./machines/wyse/configuration.nix ]; };
+        aio = { imports = [./modules/shared.nix ./machines/aio/configuration.nix]; };
         fw = {
           imports = [ ./modules/shared.nix ./machines/fw/configuration.nix ];
           clan.core = {
