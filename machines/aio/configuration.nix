@@ -26,7 +26,7 @@
   # - https://github.com/nix-community/disko/blob/master/example/luks-interactive-login.nix
   # - https://github.com/nix-community/disko/blob/master/example/luks-lvm.nix
   # ssh root@flash-installer.local lsblk --output NAME,ID-LINK,FSTYPE,SIZE,MOUNTPOINT
-  disko.devices.disk.main.device = "/dev/disk/by-id/";
+  disko.devices.disk.main.device = "/dev/disk/by-id/wwn-0x5000c5003f7bdb2b";
 
   # Locale service discovery and mDNS
   services.avahi.enable = true;
