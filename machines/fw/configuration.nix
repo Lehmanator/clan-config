@@ -1,6 +1,6 @@
-{ config, ... }:
+{ config, user, ... }:
 let
-  username = config.networking.hostName;
+  # user = config.networking.hostName;
 in
 {
   imports = [
@@ -19,12 +19,12 @@ in
 
   # Enable automatic login for the user.
   services.displayManager.autoLogin = {
+    inherit user;
     enable = true;
-    user = username;
   };
 
-  users.users.${username} = {
-    initialPassword = username;
+  users.users.${user} = {
+    initialPassword = user;
     isNormalUser = true;
     extraGroups = [
       "wheel"

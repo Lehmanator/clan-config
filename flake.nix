@@ -1,21 +1,31 @@
 {
   description = "Personal clan configs.";
-
   inputs = {
     clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
-    nuenv.url = "https://flakehub.com/f/DeterminateSystems/nuenv/*.tar.gz";
+    nuenv.url = "github:DeterminateSystems/nuenv";
   };
 
   outputs = { self, clan-core, nuenv, ... }@inputs: let
     system = "x86_64-linux";
-    pkgs = clan-core.inputs.nixpkgs.legacyPackages.${system}.appendOverlays [
-      nuenv.overlays.nuenv
-    ];
+    # pkgs = clan-core.inputs.nixpkgs.legacyPackages.${system}.appendOverlays [
+    #   nuenv.overlays.nuenv
+    # ];
+    pkgs = import clan-core.inputs.nixpkgs {
+      inherit system;
+      overlays = [nuenv.overlays.default];
+    };
     
     # Usage see: https://docs.clan.lol
     clan = clan-core.lib.buildClan {
+      meta = {
+        name = "Lehmanator"; # Ensure this is internet wide unique.
+        description = "My personal machines";
+        # icon = "";
+      };
       directory = self;
-      meta.name = "Lehmanator"; # Ensure this is internet wide unique.
+      specialArgs = {
+        user = "sam";
+      };
 
       # Prerequisite: boot into the installer
       # See: https://docs.clan.lol/getting-started/installer
@@ -31,10 +41,26 @@
             ./modules/shared.nix
             ./machines/${host}/configuration.nix
           ];
-          # Zerotier needs one controller to accept new nodes. Once accepted
-          # the controller can be offline and routing still works.
-          clan.networking.zerotier.controller.enable = true;
-          clan.networking.targetHost = pkgs.lib.mkDefault "${user}@${host}";
+          clanCore = {
+            machineDescription = "Framework Laptop";
+            machineName = "fw";
+            # machineIcon = "";
+            # tags = ["laptop" "gnome"];
+            facts = {
+              publicDirectory = null;
+              secretPathFunction = null;
+            };
+          };
+
+          clan.networking = {
+            buildHost  = pkgs.lib.mkDefault "${user}@${host}"; #:port  # SSH node where nixos-rebuild will be executed.
+            targetHost = pkgs.lib.mkDefault "${user}@${host}"; #:port  # SSH node where the result of nixos-rebuild will be deployed.
+
+            # Zerotier needs one controller to accept new nodes. Once accepted
+            # the controller can be offline and routing still works.
+            zerotier.controller.enable = true;
+          };
+
           disko.devices.disk.main.device = "/dev/disk/by-id/nvme-WD_BLACK_SN770_2TB_22382X803513";
           nixpkgs.hostPlatform = system;
           users.users.root.openssh.authorizedKeys.keys = [
@@ -84,6 +110,7 @@
   in {
     # all machines managed by Clan
     inherit (clan) nixosConfigurations clanInternals;
+    inherit inputs pkgs;
     # add the Clan CLI tool to the dev shell
     devShells.${system}.default = pkgs.mkShell {
       packages = [ 
@@ -92,21 +119,11 @@
       ];
     };
     packages.${system} = {
-      clan-cli = clan-core.packages.${system}.clan-cli;
+      inherit (clan-core.packages.${system}) clan-app clan-cli clan-cli-docs clan-ts-api editor module-docs module-schema webview-ui;
       clan-installer-instructions = pkgs.callPackage ./packages/installer-instructions.nix {};
-      clan-flash-installer = pkgs.writeShellApplication {
-        name = "clan-flash-installer";
-        runtimeInputs = [clan-core.packages.${system}.clan-cli];
-        text = ''
-          # TODO: Ask user for disk confirmmation
-          # TODO: Ask user for SSH keys
-          clan flash --flake git+https://git.clan.lol/clan/clan-core \
-            --ssh-pubkey $HOME/.ssh/id_ed25519.pub \
-            --keymap en \
-            --language en \
-            --disk main /dev/sdb \
-            flash-installer
-        '';
+      clan-flash = pkgs.callPackage ./packages/flasher.nix {
+        inherit (clan-core.packages.${system}) clan-cli;
+        clan-input-path = inputs.clan-core.outPath;
       };
     };
   };
