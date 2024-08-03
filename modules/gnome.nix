@@ -37,7 +37,7 @@ in
     # profiles.user.databases = [{settings = {"org/gnome/desktop/interface".clock-show-weekday=true;};}];
   };
   environment.systemPackages = [
-    pkgs.gnome.adwaita-icon-theme
+    pkgs.adwaita-icon-theme
     pkgs.gnomeExtensions.appindicator
   ];
   
