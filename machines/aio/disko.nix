@@ -79,7 +79,7 @@ in
       lvs = {
         # nix-store & persistence
         nix = {
-          size = "256G";
+          size = "128G";
           content = {
             type = "filesystem";
             format = "ext4";
@@ -90,7 +90,7 @@ in
 
         # TODO: /var
         var = {
-          size = "256G";
+          size = "64G";
           content = {
             type = "filesystem";
             format = "ext4";
