@@ -12,6 +12,7 @@
     user-password
     static-hosts
     trusted-nix-caches
+    ./tailscale.nix
   ];
 
   # clan.core = {
