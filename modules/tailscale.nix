@@ -18,22 +18,21 @@ in
     in rec {
       enable = true;
       authKeyFile = config.sops.secrets."tailscale-auth.key".path;
-      extraDaemonFlags = [ "-no-logs-no-support" ];
-        # "-outbound-http-proxy-listen 'localhost:8080'"
-        # "-socks5-server 'localhost:1080'"
-      extraUpFlags  = [ "--operator ${user}" ];
-      extraSetFlags = [
+
+      # NOTE: Options w/ args seem to be broken.
+      # extraDaemonFlags = [ "-no-logs-no-support" "-outbound-http-proxy-listen 'localhost:8080'" "-socks5-server 'localhost:1080'"];
+      # extraUpFlags     = [ "--operator ${user}" ];
+      extraSetFlags = [ "--webclient"
         # "--snat-subnet-routes"  # source NAT traffic to local routes advertised with --advertise-routes
-        "--advertise-routes 10.0.0.0/8,192.168.0.0/24" # routes to advertise to other nodes (comma-sep CIDRs)
-        "--advertise-tags ${tags}"
-        "--operator ${user}"
-        "--webclient"
+        # "--advertise-routes 10.0.0.0/8,192.168.0.0/24" # routes to advertise to other nodes (comma-sep CIDRs)
+        # "--advertise-tags ${tags}"
+        # "--operator ${user}"
       ] ++ optional config.services.openssh.enable "--ssh"
         ++ optionals (useRoutingFeatures=="both" || useRoutingFeatures=="client") [
         "--accept-dns"          # accept DNS configuration from admin panel
         "--accept-routes"       # accept routes advertised by other Tailscale nodes
         "--exit-node-allow-lan-access"
-        "--exit-node us-nyc-wg-301"
+        # "--exit-node us-nyc-wg-301"
       ] ++ optionals (useRoutingFeatures=="both" || useRoutingFeatures=="server") [
         "--advertise-exit-node" # offer to be exit node internet traffic for tailnet
         "--advertise-connector" # offer to be app connector for domain specific internet traffic for tailnet
