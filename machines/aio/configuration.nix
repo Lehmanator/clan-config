@@ -10,6 +10,7 @@
     machineIcon = ./logo.svg;
     machineDescription = "Dell Inspiron All-in-One desktop";
     networking = {
+      buildHost = "root@wyse.local";
       # Set this for clan commands use ssh i.e. `clan machines update`
       # If you change the hostname, you need to update this line to root@<new-hostname>
       # This only works however if you have avahi running on your admin machine else use IP

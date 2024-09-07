@@ -13,6 +13,7 @@ in
     machineIcon = ./logo.svg;
     machineDescription = "Dell Wyse mini desktop";
     networking = {
+      # buildHost = "sam@fw.local";
       # Set this for clan commands use ssh i.e. `clan machines update`
       # If you change the hostname, you need to update this line to root@<new-hostname>
       # This only works however if you have avahi running on your admin machine else use IP
