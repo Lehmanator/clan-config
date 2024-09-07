@@ -1,11 +1,16 @@
 {
   description = "Personal clan configs.";
   inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
     nuenv.url = "github:DeterminateSystems/nuenv";
+    lix-module = {
+      url = "https://git.lix.systems/lix-project/nixos-module/archive/2.91.0.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, clan-core, nuenv, ... }@inputs: let
+  outputs = { self, clan-core, lix-module, nuenv, ... }@inputs: let
     system = "x86_64-linux";
     pkgs = import clan-core.inputs.nixpkgs { inherit system; overlays = [nuenv.overlays.default]; };
     

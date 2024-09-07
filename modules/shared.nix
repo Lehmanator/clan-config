@@ -5,6 +5,8 @@
 }:
 {
   imports = with clan-core.clanModules; [
+    inputs.lix-module.nixosModules.default
+    # --- clanModules ---
     borgbackup #-static
     localsend
     sshd
