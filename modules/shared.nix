@@ -6,6 +6,7 @@
 {
   imports = with clan-core.clanModules; [
     inputs.lix-module.nixosModules.default
+
     # --- clanModules ---
     borgbackup #-static
     localsend
@@ -98,4 +99,9 @@
   system.stateVersion = "24.05";
   services.openssh.enable = true;
   # nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
+  environment.systemPackages = [
+    pkgs.manix
+    pkgs.nix-doc
+  ];
 }
