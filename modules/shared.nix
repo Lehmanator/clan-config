@@ -1,6 +1,7 @@
 { config, lib, pkgs
 , clan-core
 , user
+, inputs
 , ...
 }:
 {
