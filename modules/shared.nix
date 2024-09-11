@@ -9,7 +9,6 @@
     inputs.lix-module.nixosModules.default
 
     # --- clanModules ---
-    borgbackup #-static
     localsend
     sshd
     root-password
