@@ -23,7 +23,7 @@ in
       tracker.enable = true;
     };
     sysprof.enable = true;
-    udev.packages = [ pkgs.gnome.gnome-settings-daemon ];
+    udev.packages = [ pkgs.gnome-settings-daemon ];
   };
 
   systemd.services = mkIf config.services.displayManager.autoLogin.enable {
