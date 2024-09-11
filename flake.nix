@@ -11,8 +11,10 @@
   };
 
   outputs = { self, clan-core, lix-module, nuenv, ... }@inputs: let
+    debug = true;
     system = "x86_64-linux";
     pkgs = import clan-core.inputs.nixpkgs { inherit system; overlays = [nuenv.overlays.default]; };
+    inherit (clan-core.inputs.nixpkgs) lib;
     
     # Usage:
     # - https://docs.clan.lol
@@ -25,23 +27,8 @@
       };
       directory = self;
       specialArgs = { 
-        inherit inputs self;
+        inherit inputs; # self;
         user = "sam";
-      };
-
-      # Func mapping arch (string) -> instantiated pkgs.
-      #  If specified, this nixpkgs only imported once per `system`.
-      #  Improves performance, but all nipxkgs.* options will be ignored on hosts.
-      pkgsForSystem = system: import clan-core.inputs.nixpkgs {
-        inherit system;
-        config = {
-          allowBroken = false;
-          allowUnfree = true;
-          allowUnsupportedSystem = true;
-        };
-        overlays = [
-          nuenv.overlays.default
-        ];
       };
 
       # Pre-requisite: boot into the installer
@@ -121,10 +108,6 @@
       };
     };
   in {
-    # all machines managed by Clan
-    inherit (clan) clanInternals;
-    inherit inputs pkgs;
-
     nixosConfigurations = clan.nixosConfigurations // {
       # Inherit installer config from upstream clan-core.
       # TODO: Auto-add SSH keys from other machines.
@@ -146,5 +129,9 @@
         clan-input-path = inputs.clan-core.outPath;
       };
     };
+  } // lib.optionalAttrs debug {
+    inherit (clan) clanInternals;
+    inherit inputs pkgs system;
+    lib = lib // clan-core.lib;
   };
 }
