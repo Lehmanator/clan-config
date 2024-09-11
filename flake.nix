@@ -22,7 +22,10 @@
         # icon = "https://github.com/Lehmanator/Lehmanator/blob/main/assets/images/profile.png";
       };
       directory = self;
-      specialArgs = { user = "sam"; inherit inputs; };
+      specialArgs = { 
+        inherit inputs self;
+        user = "sam";
+      };
 
       # Pre-requisite: boot into the installer
       # See: https://docs.clan.lol/getting-started/installer
