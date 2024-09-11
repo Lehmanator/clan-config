@@ -29,6 +29,21 @@
         user = "sam";
       };
 
+      # Func mapping arch (string) -> instantiated pkgs.
+      #  If specified, this nixpkgs only imported once per `system`.
+      #  Improves performance, but all nipxkgs.* options will be ignored on hosts.
+      pkgsForSystem = system: import clan-core.inputs.nixpkgs {
+        inherit system;
+        config = {
+          allowBroken = false;
+          allowUnfree = true;
+          allowUnsupportedSystem = true;
+        };
+        overlays = [
+          nuenv.overlays.default
+        ];
+      };
+
       # Pre-requisite: boot into the installer
       # See: https://docs.clan.lol/getting-started/installer
       # local> mkdir -p ./machines/machine1

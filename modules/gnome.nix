@@ -3,7 +3,7 @@ let
   inherit (lib) mkDefault mkIf;
 in
 {
-  clan.tags = ["gnome" "desktop"];
+  # clan.tags = ["gnome" "desktop"];
   services = {
     displayManager.autoLogin = { 
       inherit user;
