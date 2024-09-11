@@ -14,7 +14,9 @@
     system = "x86_64-linux";
     pkgs = import clan-core.inputs.nixpkgs { inherit system; overlays = [nuenv.overlays.default]; };
     
-    # Usage see: https://docs.clan.lol
+    # Usage:
+    # - https://docs.clan.lol
+    # - https://docs.clan.lol/reference/nix-api/buildclan/
     clan = clan-core.lib.buildClan {
       meta = {
         name = "Lehmanator";
