@@ -22,7 +22,6 @@
     clan = clan-core.lib.buildClan {
       meta = {
         name = "Lehmanator";
-        description = "My personal machines";
         # icon = "https://github.com/Lehmanator/Lehmanator/blob/main/assets/images/profile.png";
       };
       directory = self;
