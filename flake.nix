@@ -124,10 +124,10 @@
     };
   in {
     apps.${system} = {
-      app = { type = "app"; program = clan-core.packages.${system}.clan-app; };
-      cli = { type = "app"; program = clan-core.packages.${system}.clan-cli; };
-      vm-manager = { type = "app"; program = clan-core.packages.${system}.clan-vm-manager; };
-      webview-ui = { type = "app"; program = clan-core.packages.${system}.clan-webview-ui; };
+      app = { type = "app"; program = clan-core.packages.${system}.clan-app; meta.description="GTK4 app to manage your clan"; };
+      cli = { type = "app"; program = clan-core.packages.${system}.clan-cli; meta.description="CLI to manage your clan"; };
+      vm-manager = { type = "app"; program = clan-core.packages.${system}.clan-vm-manager; meta.description="GTK4 app to manage clan-based virtual machines"; };
+      webview-ui = { type = "app"; program = clan-core.packages.${system}.clan-webview-ui; meta.description="Web app to manage your clan"; };
     };
     nixosConfigurations = clan.nixosConfigurations // {
       # Inherit installer config from upstream clan-core.
