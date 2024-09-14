@@ -20,13 +20,9 @@
     # - https://docs.clan.lol
     # - https://docs.clan.lol/reference/nix-api/buildclan/
     clan = clan-core.lib.buildClan {
-      meta = {
-        name = "Lehmanator";
-        # icon = "https://github.com/Lehmanator/Lehmanator/blob/main/assets/images/profile.png";
-      };
       directory = self;
       specialArgs = { 
-        inherit inputs; # self;
+        inherit inputs self;
         user = "sam";
       };
 
@@ -89,6 +85,11 @@
 
       # https://docs.clan.lol/reference/nix-api/inventory/
       inventory = {
+        meta = {
+          name = "Lehmanator";
+          description = "Personal clan configs";
+          icon = "https://github.com/Lehmanator/Lehmanator/blob/main/assets/images/profile.png";
+        };
         machines = {
           fw = {
             name = "fw";
