@@ -137,7 +137,7 @@
       ];
     };
     packages.${system} = {
-      inherit (clan-core.packages.${system}) clan-app clan-cli clan-cli-docs clan-ts-api editor module-docs module-schema webview-ui;
+      inherit (clan-core.packages.${system}) clan-app clan-cli clan-cli-docs clan-ts-api clan-vm-manager editor module-docs module-schema webview-ui;
       clan-installer-instructions = pkgs.callPackage ./packages/installer-instructions.nix {};
       clan-flash                  = pkgs.callPackage ./packages/flasher.nix {
         inherit (clan-core.packages.${system}) clan-cli;
