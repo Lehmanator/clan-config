@@ -123,6 +123,12 @@
       };
     };
   in {
+    apps.${system} = {
+      app = { type = "app"; program = clan-core.packages.${system}.clan-app; };
+      cli = { type = "app"; program = clan-core.packages.${system}.clan-cli; };
+      vm-manager = { type = "app"; program = clan-core.packages.${system}.clan-vm-manager; };
+      webview-ui = { type = "app"; program = clan-core.packages.${system}.clan-webview-ui; };
+    };
     nixosConfigurations = clan.nixosConfigurations // {
       # Inherit installer config from upstream clan-core.
       # TODO: Auto-add SSH keys from other machines.
