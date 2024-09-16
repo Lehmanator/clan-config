@@ -4,16 +4,15 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
     nuenv.url = "github:DeterminateSystems/nuenv";
+    flake-utils.url = "github:numtide/flake-utils";
     lix-module = {
       url = "https://git.lix.systems/lix-project/nixos-module/archive/2.91.0.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, clan-core, lix-module, nuenv, ... }@inputs: let
+  outputs = { self, clan-core, flake-utils, lix-module, nuenv, ... }@inputs: let
     debug = true;
-    system = "x86_64-linux";
-    pkgs = import clan-core.inputs.nixpkgs { inherit system; overlays = [nuenv.overlays.default]; };
     inherit (clan-core.inputs.nixpkgs) lib;
     
     # Usage:
@@ -41,6 +40,10 @@
         ];
       };
 
+      # NOTE: Machines in `machines/${name}/configuration.nix` will be registered automatically.
+      # NOTE: Use any clanModule in inventory & add machines via `roles.default.*`
+      # NOTE: All machine declarations merged (buildClan {machines}, inventory.machines)
+      # NOTE: clan-app UI only creates machines in inventory.
       # Pre-requisite: boot into the installer
       # See: https://docs.clan.lol/getting-started/installer
       # local> mkdir -p ./machines/machine1
@@ -83,7 +86,10 @@
           # };
         };
 
-      # https://docs.clan.lol/reference/nix-api/inventory/
+      # Inventory Docs:
+      # - https://docs.clan.lol/guides/inventory/
+      # - https://docs.clan.lol/reference/nix-api/inventory/
+      # Build API schema: `nix build git+https://git.clan.lol/clan/clan-core#inventory-schema`
       inventory = {
         meta = {
           name = "Lehmanator";
@@ -113,6 +119,10 @@
             system = "x86_64-linux";
           };
         };
+
+        # Per-instance: services.<serviceName>.<instanceName>.config
+        # Per-role:     services.<serviceName>.<instanceName>.roles.<roleName>.config
+        # Per-machine:  services.<serviceName>.<instanceName>.machines.<machineName>.config
         services = {
           # borgbackup.instance_1 = {
           #   roles.server.machines = ["wyse"];
@@ -122,37 +132,67 @@
         };
       };
     };
+  in (flake-utils.lib.eachDefaultSystem (system: let
+    pkgs = import clan-core.inputs.nixpkgs { inherit system; overlays = [nuenv.overlays.default]; };
+    clanPkgs = clan-core.packages.${system};
+    selfPkgs = self.packages.${system};
   in {
-    apps.${system} = {
-      app = { type = "app"; program = clan-core.packages.${system}.clan-app; meta.description="GTK4 app to manage your clan"; };
-      cli = { type = "app"; program = clan-core.packages.${system}.clan-cli; meta.description="CLI to manage your clan"; };
-      vm-manager = { type = "app"; program = clan-core.packages.${system}.clan-vm-manager; meta.description="GTK4 app to manage clan-based virtual machines"; };
-      webview-ui = { type = "app"; program = clan-core.packages.${system}.clan-webview-ui; meta.description="Web app to manage your clan"; };
-    };
-    nixosConfigurations = clan.nixosConfigurations // {
-      # Inherit installer config from upstream clan-core.
-      # TODO: Auto-add SSH keys from other machines.
-      inherit (inputs.clan-core.nixosConfigurations) flash-installer;
+    apps = with clanPkgs; rec {
+      default    = cli;
+      app        = { type="app"; program=clan-app;        meta.description="GTK app to manage your clan";  };
+      cli        = { type="app"; program=clan-cli;        meta.description="CLI to manage your clan";      };
+      vm-manager = { type="app"; program=clan-vm-manager; meta.description="GTK app to manage clan VMs";   };
+      webview-ui = { type="app"; program=clan-webview-ui; meta.description="Web app to manage your clan";  };
     };
 
     # add the Clan CLI tool to the dev shell
-    devShells.${system}.default = pkgs.mkShell {
+    # TODO: Fix nix develop build hanging
+    devShells.default = pkgs.mkShell {
+      name = "clan";
       packages = [ 
-        clan-core.packages.${system}.clan-cli
-        self.packages.${system}.clan-flash
+        pkgs.onefetch
+        clanPkgs.clan-app
+        clanPkgs.clan-cli
+        clanPkgs.clan-vm-manager
+        clanPkgs.module-docs
+        clanPkgs.editor
+        clanPkgs.webview-ui
+        selfPkgs.clan-flash
+        selfPkgs.clan-installer-instructions
+        selfPkgs.clan-module-schema
       ];
+      shellHook = ''
+        ${lib.getExe pkgs.onefetch} 
+        echo "---[Clan: Overview]---"
+        ${clanPkgs.clan-cli}/bin/clan show
+        echo "---[Clan: Machines]---"
+        ${clanPkgs.clan-cli}/bin/clan machines list | xargs -n1 ${clanPkgs.clan-cli}/bin/clan machines show && echo '\n'
+      '';
     };
-    packages.${system} = {
-      inherit (clan-core.packages.${system}) clan-app clan-cli clan-cli-docs clan-ts-api clan-vm-manager editor module-docs module-schema webview-ui;
+    packages = {
+      inherit (clanPkgs) clan-app clan-cli clan-cli-docs clan-ts-api clan-vm-manager;
+      clan-codium-editor = clanPkgs.editor;
+      clan-webview-ui = clanPkgs.webview-ui;
       clan-installer-instructions = pkgs.callPackage ./packages/installer-instructions.nix {};
       clan-flash                  = pkgs.callPackage ./packages/flasher.nix {
-        inherit (clan-core.packages.${system}) clan-cli;
+        inherit (clanPkgs) clan-cli;
         clan-input-path = inputs.clan-core.outPath;
       };
+      clan-module-docs = clanPkgs.module-docs;
+      clan-module-schema = pkgs.writeShellScript "clan-module-schema-preview" ''
+        ${lib.getExe pkgs.jq} '.' ${clanPkgs.module-schema} --color-output | ${lib.getExe pkgs.bat} --plain
+      '';
     };
+  })) // {
+    nixosConfigurations = clan.nixosConfigurations // {
+      # Inherit installer config from upstream clan-core.
+      # TODO: Auto-add SSH keys from other machines.
+      inherit (clan-core.nixosConfigurations) flash-installer;
+    };
+    
   } // lib.optionalAttrs debug {
     inherit (clan) clanInternals;
-    inherit inputs pkgs system;
+    inherit inputs;
     lib = lib // clan-core.lib;
   };
 }
