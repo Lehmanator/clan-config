@@ -105,7 +105,7 @@
             name = "fw";
             description = "Framework Laptop 13";
             icon = "./machines/fw/icon.svg";
-            tags = ["backup"];
+            tags = ["all" "backup"];
             system = "x86_64-linux";
             deploy.targetHost = "fw.local";
           };
@@ -113,7 +113,7 @@
             name = "wyse";
             description = "Dell Wyse Mini Desktop";
             icon = "./machines/wyse/icon.svg";
-            tags = ["backup" "backup_server"];
+            tags = ["all" "backup" "backup_server"];
             system = "x86_64-linux";
             deploy.targetHost = "root@wyse.local";
           };
@@ -121,7 +121,7 @@
             name = "aio";
             description = "Dell Inspiron All-in-One Desktop";
             icon = "./machines/aio/icon.svg";
-            tags = ["backup"];
+            tags = ["all" "backup"];
             system = "x86_64-linux";
             deploy.targetHost = "root@aio.local";
           };
@@ -134,7 +134,7 @@
         services = {
           admin.instance_1 = { 
             roles.default = {
-              tags = ["backup"];
+              tags = ["all"];
               config.allowedKeys = {
                 aio     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1iVBM368vGUuEWpHoYDwiD6pv8Tq1ZNGMdbD2jedUm sam@aio";
                 fw      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB2M80EUw0wQaBNutE06VNgSViVot6RL0O6iv2P1ewWH sam@fw";
@@ -151,17 +151,17 @@
           #   roles.client.tags = ["backup"];
           # };
           disk-id.instance_1 = {
-            roles.default.tags = ["backup"];
+            roles.default.tags = ["all"];
           };
           machine-id.instance_1 = {
-            roles.default.tags = ["backup"];
+            roles.default.tags = ["all"];
           };
           state-version.instance_1 = {
-            roles.default.tags = ["backup"];
+            roles.default.tags = ["all"];
           };
           # single-disk.default = {
           #   meta.name = "single-disk";
-          #   roles.default.tags = ["backup"];
+          #   roles.default.tags = ["all"];
           #   machines = {
           #     aio.config.device = "/dev/sda";
           #     fw.config.device = "/dev/nvme0n1";
