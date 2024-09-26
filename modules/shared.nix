@@ -1,7 +1,4 @@
-{ config, lib, pkgs
-, inputs
-, ...
-}:
+{ inputs, config, lib, pkgs, ... }:
 {
   imports = with inputs; [
     lix-module.nixosModules.default
@@ -36,7 +33,6 @@
       fw.publicKeyFile =   fw.config.clan.core.facts.services.openssh.public.path;
     wyse.publicKeyFile = wyse.config.clan.core.facts.services.openssh.public.path;
   };
-  services.openssh.enable = true;
 
   # See: https://jade.fyi/blog/finding-functions-in-nixpkgs/
   # TODO: Create separate module/profile for Nix docs

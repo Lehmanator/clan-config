@@ -43,49 +43,13 @@
     # - https://docs.clan.lol/reference/nix-api/buildclan/
     clan = clan-core.lib.buildClan {
       directory = self;
-      pkgsForSystem = mkPkgs; # str->pkgs (instantiated for all machines) Improves perf, hosts ignore nipxkgs.* options.
+      pkgsForSystem = mkPkgs;
       specialArgs = { inherit inputs; };
-
-      # NOTE: Machines in `machines/${name}/configuration.nix` will be registered automatically.
-      # NOTE: Use any clanModule in inventory & add machines via `roles.default.*`
-      # NOTE: All machine declarations merged (buildClan {machines}, inventory.machines)
-      # NOTE: clan-app UI only creates machines in inventory.
-      # Pre-requisite: boot into the installer
-      # See: https://docs.clan.lol/getting-started/installer
-      # local> mkdir -p ./machines/machine1
-      # local> Edit ./machines/machine1/configuration.nix to your liking
-      # machines = rec { default = fw; defaultVM = ?;
       machines = {
         wyse = { imports = [ ./modules/shared.nix ./machines/wyse/configuration.nix ]; };
         aio  = { imports = [ ./modules/shared.nix ./machines/aio/configuration.nix  ]; };
         fw   = { imports = [ ./modules/shared.nix ./machines/fw/configuration.nix   ]; };
-          # clan.core = {
-          #   # state = {}; # State directories to backup & restore
-          #   # tags = ["laptop" "gnome"];
-          #   # facts = {
-          #   #   publicStore = "in_repo";    # in_repo | vm | custom
-          #   #   publicDirectory    = null;  # Dir where public facts are stored
-          #   #   secretPathFunction = null;  # Function to use to generate path for a decret.
-          #   #   secretStore = "sops"; # sops | password-store | vm | custom
-          #   #   secretUploadDirectory = null; # Dir where secrets are uploaded into. This is backend-specific.
-          #   #   services.example = {
-          #   #     name = "example";
-          #   #     generator = {path=[]; prompt="Text for user prompt"; script = "myscript.sh"; };
-          #   #     # Public facts to generate for this service
-          #   #     public.factName = {
-          #   #       name = "example";
-          #   #       path = "${config.clan.core.clanDir}/machines/${config.clan.core.machineName}/facts/${fact.config.name}";
-          #   #       value = "${config.clan.core.clanDir}/${fact.config.path}";
-          #   #     }; 
-          #   #     secret.factName = {
-          #   #       name = "example";
-          #   #       path = "/no-such-path";
-          #   #       groups = [];
-          #   #     }; 
-          #   #   };
-          #   # };
-          # };
-        };
+      };
 
       # Inventory Docs:
       # - https://docs.clan.lol/guides/inventory/
