@@ -65,6 +65,14 @@
   #clan.single-disk.device = "/dev/disk/";
   # nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
+  # TODO: Map using nixosConfigurations
+  programs.ssh.knownHosts = with inputs.self.nixosConfigurations; {
+     aio.publicKeyFile =  aio.config.clan.core.facts.services.openssh.public.path;
+      fw.publicKeyFile =   fw.config.clan.core.facts.services.openssh.public.path;
+    wyse.publicKeyFile = wyse.config.clan.core.facts.services.openssh.public.path;
+  };
+  services.openssh.enable = true;
+
   # See: https://jade.fyi/blog/finding-functions-in-nixpkgs/
   # TODO: Create separate module/profile for Nix docs
   nix.package = pkgs.lix;
