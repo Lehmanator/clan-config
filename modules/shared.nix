@@ -14,6 +14,7 @@
     sshd
     root-password
     user-password
+    state-version
     static-hosts
     trusted-nix-caches
     ./tailscale.nix
