@@ -7,14 +7,13 @@
   ];
 
   clan.core = {
-    machineIcon = ./logo.svg;
-    machineDescription = "Dell Inspiron All-in-One desktop";
     networking = {
-      buildHost = "root@wyse.local";
+      # buildHost = "root@wyse.local";
       # Set this for clan commands use ssh i.e. `clan machines update`
       # If you change the hostname, you need to update this line to root@<new-hostname>
       # This only works however if you have avahi running on your admin machine else use IP
       # targetHost = pkgs.lib.mkDefault "${user}@${config.networking.hostName}";
+      # targetHost = "root@aio.local";
       zerotier = {
         # moon.stableEndpoints = [ "home" ];
         # networkId = builtins.readFile ../${host}/facts/zerotier-network-id;
