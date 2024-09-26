@@ -35,4 +35,16 @@
   services.avahi.enable = true;
 
   nixpkgs.hostPlatform = "x86_64-linux";
+
+  # This machine has an old Windows disk connected.
+  #  so we'll temporarily allow using NTFS partitions at boot.
+  # https://wiki.nixos.org/wiki/NTFS
+  # https://nixos.wiki/wiki/NTFS
+  # TODO: Make sure this is correct.
+  # fileSystems."/mnt/hybrid-drive-750GB" = {
+  #   device = "/dev/sda1";
+  #   fsType = "ntfs-3g";
+  #   options = ["rw" "uid=1000"];
+  # };
+  boot.supportedFilesystems = ["ntfs"];
 }
