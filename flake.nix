@@ -44,10 +44,7 @@
     clan = clan-core.lib.buildClan {
       directory = self;
       pkgsForSystem = mkPkgs; # str->pkgs (instantiated for all machines) Improves perf, hosts ignore nipxkgs.* options.
-      specialArgs = {
-        inherit inputs self;
-        user = "sam";
-      };
+      specialArgs = { inherit inputs; };
 
       # NOTE: Machines in `machines/${name}/configuration.nix` will be registered automatically.
       # NOTE: Use any clanModule in inventory & add machines via `roles.default.*`
