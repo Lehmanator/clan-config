@@ -1,4 +1,4 @@
-{ config, lib, pkgs, user, ... }:
+{ config, lib, pkgs, ... }:
 let
   inherit (lib) concatStringsSep mkBefore mkIf optional optionals;
 
@@ -21,12 +21,12 @@ in
 
       # NOTE: Options w/ args seem to be broken.
       # extraDaemonFlags = [ "-no-logs-no-support" "-outbound-http-proxy-listen 'localhost:8080'" "-socks5-server 'localhost:1080'"];
-      # extraUpFlags     = [ "--operator ${user}" ];
+      # extraUpFlags     = [ "--operator ${config.clan.user-password.user}" ];
       extraSetFlags = [ "--webclient"
         # "--snat-subnet-routes"  # source NAT traffic to local routes advertised with --advertise-routes
         # "--advertise-routes 10.0.0.0/8,192.168.0.0/24" # routes to advertise to other nodes (comma-sep CIDRs)
         # "--advertise-tags ${tags}"
-        # "--operator ${user}"
+        # "--operator ${config.clan.user-password.user}"
       ] ++ optional config.services.openssh.enable "--ssh"
         ++ optionals (useRoutingFeatures=="both" || useRoutingFeatures=="client") [
         "--accept-dns"          # accept DNS configuration from admin panel
@@ -39,7 +39,7 @@ in
       ];
       interfaceName = "tailscale0";
       openFirewall = true;
-      permitCertUid = user;
+      permitCertUid = config.clan.user-password.user;
       port = 41641;
       useRoutingFeatures = if isRouter then "both" else "client"; # Enable subnet routers & exit nodes.  (none|client|server|both)
     };

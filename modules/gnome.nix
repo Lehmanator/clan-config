@@ -1,19 +1,15 @@
-{ config, lib, pkgs, user, ... }:
-let
-  inherit (lib) mkDefault mkIf;
-in
+{ inputs, config, lib, pkgs, ... }:
 {
-  # clan.tags = ["gnome" "desktop"];
   services = {
     displayManager.autoLogin = { 
-      inherit user;
-      enable = mkDefault false;
+      inherit (config.clan.user-password) user;
+      enable = lib.mkDefault false;
     };
     flatpak.enable = true;
     xserver = {
       enable = true;
       desktopManager.gnome.enable = true;
-      displayManager.gdm.enable = mkDefault true;
+      displayManager.gdm.enable = lib.mkDefault true;
     };
 
     gnome = {
@@ -27,12 +23,12 @@ in
     udev.packages = [ pkgs.gnome-settings-daemon ];
   };
 
-  systemd.services = mkIf config.services.displayManager.autoLogin.enable {
+  systemd.services = lib.mkIf config.services.displayManager.autoLogin.enable {
     "getty@tty1".enable = false;
     "autovt@tty1".enable = false;
   };
 
-  users.users.${user}.extraGroups = ["gdm" "networkmanager"];
+  users.users.${config.clan.user-password.user}.extraGroups = ["gdm" "networkmanager"];
   programs.dconf = {
     enable = true;
     # profiles.user.databases = [{settings = {"org/gnome/desktop/interface".clock-show-weekday=true;};}];
@@ -45,18 +41,18 @@ in
   # Declarative Profile Picture
   # TODO: Use path relative to config.clan.core.clanDir
   system.activationScripts.script.text = let
-    profile-pic = ../icon.png;
+    profile-pic = inputs.self + /icon.png;
     #cp /home/${user}/PATH-TO/.face /var/lib/AccountsService/icons/${user}
   in ''
     mkdir -p /var/lib/AccountsService/{icons,users}
-    cp ${profile-pic} /var/lib/AccountsService/icons/${user}
-    echo -e "[User]\nIcon=/var/lib/AccountsService/icons/${user}\n" > /var/lib/AccountsService/users/${user}
+    cp ${profile-pic} /var/lib/AccountsService/icons/${config.clan.user-password.user}
+    echo -e "[User]\nIcon=/var/lib/AccountsService/icons/${config.clan.user-password.user}\n" > /var/lib/AccountsService/users/${config.clan.user-password.user}
 
-    chown root:root /var/lib/AccountsService/users/${user}
-    chmod      0600 /var/lib/AccountsService/users/${user}
+    chown root:root /var/lib/AccountsService/users/${config.clan.user-password.user}
+    chmod      0600 /var/lib/AccountsService/users/${config.clan.user-password.user}
 
-    chown root:root /var/lib/AccountsService/icons/${user}
-    chmod      0444 /var/lib/AccountsService/icons/${user}
+    chown root:root /var/lib/AccountsService/icons/${config.clan.user-password.user}
+    chmod      0444 /var/lib/AccountsService/icons/${config.clan.user-password.user}
 '';
 
 }

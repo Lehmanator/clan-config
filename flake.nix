@@ -44,7 +44,7 @@
     clan = clan-core.lib.buildClan {
       directory = self;
       pkgsForSystem = mkPkgs; # str->pkgs (instantiated for all machines) Improves perf, hosts ignore nipxkgs.* options.
-      specialArgs = { 
+      specialArgs = {
         inherit inputs self;
         user = "sam";
       };
@@ -98,22 +98,23 @@
         meta = {
           name = "Lehmanator";
           description = "Personal clan configs";
-          icon = "https://github.com/Lehmanator/Lehmanator/blob/main/assets/images/profile.png";
+          # icon = "${inputs.self}/icon.png";  
+          # icon = ./icon.png;
         };
         machines = {
           fw = {
             name = "fw";
             description = "Framework Laptop 13";
             icon = "./machines/fw/icon.svg";
-            tags = ["all" "backup"];
+            tags = ["all" "laptop"];
             system = "x86_64-linux";
-            deploy.targetHost = "fw.local";
+            deploy.targetHost = "root@fw.local";
           };
           wyse = {
             name = "wyse";
             description = "Dell Wyse Mini Desktop";
             icon = "./machines/wyse/icon.svg";
-            tags = ["all" "backup" "backup_server"];
+            tags = ["all" "desktop" "backup"];
             system = "x86_64-linux";
             deploy.targetHost = "root@wyse.local";
           };
@@ -121,16 +122,12 @@
             name = "aio";
             description = "Dell Inspiron All-in-One Desktop";
             icon = "./machines/aio/icon.svg";
-            tags = ["all" "backup"];
+            tags = ["all" "desktop"];
             system = "x86_64-linux";
             deploy.targetHost = "root@aio.local";
           };
         };
 
-        # Per-instance: services.<serviceName>.<instanceName>.config
-        # Per-role:     services.<serviceName>.<instanceName>.roles.<roleName>.config
-        # Per-machine:  services.<serviceName>.<instanceName>.machines.<machineName>.config
-        # Use any clanModule in inventory & add machines via: roles.default.*
         services = {
           admin.instance_1 = { 
             roles.default = {
@@ -145,29 +142,27 @@
               };
             };
           };
-          # borgbackup.instance_1 = {
-          #   roles.server.machines = ["wyse"];
-          #   roles.server.tags = ["backup-server"];
-          #   roles.client.tags = ["backup"];
-          # };
-          disk-id.instance_1 = {
-            roles.default.tags = ["all"];
+          disk-id.instance_1.roles.default.tags = ["all"];
+          localsend.instance_1.roles.default = {
+            tags = ["all"];
+            config.enable = true;
           };
-          machine-id.instance_1 = {
-            roles.default.tags = ["all"];
+          machine-id.instance_1.roles.default.tags = ["all"];
+          root-password.instance_1.roles.default.tags = ["all"];
+          sshd.instance_1.roles.default.tags = ["all"];
+          state-version.instance_1.roles.default.tags = ["all"];
+          static-hosts.instance_1.roles.default = {
+            tags = ["all"];
+            config = {
+              topLevelDomain = "lehman.run";
+              excludeHosts = ["nixos"];
+            };
           };
-          state-version.instance_1 = {
-            roles.default.tags = ["all"];
+          trusted-nix-caches.instance_1.roles.default.tags = ["all"];
+          user-password.instance_1.roles.default = {
+            config = { prompt=true; user="sam"; };
+            tags = ["all"];
           };
-          # single-disk.default = {
-          #   meta.name = "single-disk";
-          #   roles.default.tags = ["all"];
-          #   machines = {
-          #     aio.config.device = "/dev/sda";
-          #     fw.config.device = "/dev/nvme0n1";
-          #     wyse.config.device = "/dev/nvme0n1";
-          #   };
-          # };
         };
       };
     };
