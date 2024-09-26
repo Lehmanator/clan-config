@@ -19,43 +19,8 @@
     ./tailscale.nix
   ];
 
-  # clan.core = {
-  #   clanDir = ../.;
-  #   clanIcon = ../assets/sam.png;
-  #   clanName = "Lehmanator";
-  #
-  #   # machineIcon = ../machines/${config.networking.hostName}/icon.png;
-  #   # machineName = config.networking.hostName;
-  #
-  #   sops.defaultGroups = ["admins"];
-  #
-  #   # Attrset of state directories to backup & restore
-  #   state = {
-  #     myfolder = {
-  #       name = "myfolder";
-  #       folders = ["list" "of" "string"]; # Folder where state resides in
-  #       preBackupCommand   = "";
-  #       preBackupScript    = '''';
-  #       preRestoreCommand  = "";
-  #       preRestoreScript   = '''';
-  #       postRestoreCommand = "";
-  #       postRestoreScript  = '''';
-  #     };
-  #   };  
-  # };
   clan.core = {
     deployment.requireExplicitUpdate = lib.mkDefault false;
-    machineName = lib.mkDefault config.networking.hostName;
-    networking = {
-      buildHost  = lib.mkDefault "root@${config.networking.hostName}.local"; #:port  # SSH node where nixos-rebuild will be executed.
-      targetHost = lib.mkDefault "root@${config.networking.hostName}.local"; #:port  # SSH node where the result of nixos-rebuild will be deployed.
-      # buildHost  = lib.mkDefault "${user}@${config.networking.hostName}"; #:port  # SSH node where nixos-rebuild will be executed.
-      # targetHost = lib.mkDefault "${user}@${config.networking.hostName}"; #:port  # SSH node where the result of nixos-rebuild will be deployed.
-
-      # Zerotier needs one controller to accept new nodes. Once accepted
-      # the controller can be offline and routing still works.
-      zerotier.controller.enable = lib.mkDefault false;
-    };
   };
 
   clan.static-hosts = {
