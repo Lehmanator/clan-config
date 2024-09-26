@@ -12,11 +12,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1726847531,
-        "narHash": "sha256-HAxO6BSt932f/kcoBkjzXH23m/FDAbJ+kQ94IwV2Dxw=",
-        "rev": "25ec3308d1902ef67c190eab47889f2ea12c5e10",
+        "lastModified": 1727024315,
+        "narHash": "sha256-6LaPwgmDMqXUK14bHa8Yj4IMdNPdxH5l/EcHoJOd1Ik=",
+        "rev": "32f70d201c3049941b7bb6fae4f18c7b1cda941a",
         "type": "tarball",
-        "url": "https://git.clan.lol/api/v1/repos/clan/clan-core/archive/25ec3308d1902ef67c190eab47889f2ea12c5e10.tar.gz?rev=25ec3308d1902ef67c190eab47889f2ea12c5e10"
+        "url": "https://git.clan.lol/api/v1/repos/clan/clan-core/archive/32f70d201c3049941b7bb6fae4f18c7b1cda941a.tar.gz?rev=32f70d201c3049941b7bb6fae4f18c7b1cda941a"
       },
       "original": {
         "type": "tarball",
@@ -169,6 +169,21 @@
         "url": "https://git.lix.systems/lix-project/nixos-module/archive/2.91.0.tar.gz"
       }
     },
+    "nixlib": {
+      "locked": {
+        "lastModified": 1726362065,
+        "narHash": "sha256-4h15WKdrs9zf6DGaeeV7ntU/pHHGkH6geYt1QBW0CP4=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "9db4db09d82e4b2207bfa7f1e747a4f49d214555",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
     "nixos-facter-modules": {
       "locked": {
         "lastModified": 1726241088,
@@ -181,6 +196,27 @@
       "original": {
         "owner": "numtide",
         "repo": "nixos-facter-modules",
+        "type": "github"
+      }
+    },
+    "nixos-generators": {
+      "inputs": {
+        "nixlib": "nixlib",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1726817511,
+        "narHash": "sha256-r3R7zZzGklN0udSO/JhWbU/xyq6i1aXKKwfs33LUVls=",
+        "owner": "nix-community",
+        "repo": "nixos-generators",
+        "rev": "bfa25c9065f4cb5d884a0ad70f6e82f55ae90448",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixos-generators",
         "type": "github"
       }
     },
@@ -226,22 +262,6 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1726755586,
-        "narHash": "sha256-PmUr/2GQGvFTIJ6/Tvsins7Q43KTMvMFhvG6oaYK+Wk=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "c04d5652cfa9742b1d519688f65d1bbccea9eb7e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_3": {
-      "locked": {
         "lastModified": 1701436327,
         "narHash": "sha256-tRHbnoNI8SIM5O5xuxOmtSLnswEByzmnQcGGyNRjxsE=",
         "rev": "91050ea1e57e50388fa87a3302ba12d188ef723a",
@@ -256,7 +276,7 @@
     },
     "nuenv": {
       "inputs": {
-        "nixpkgs": "nixpkgs_3",
+        "nixpkgs": "nixpkgs_2",
         "rust-overlay": "rust-overlay"
       },
       "locked": {
@@ -278,7 +298,11 @@
         "clan-core": "clan-core",
         "flake-utils": "flake-utils",
         "lix-module": "lix-module",
-        "nixpkgs": "nixpkgs_2",
+        "nixos-generators": "nixos-generators",
+        "nixpkgs": [
+          "clan-core",
+          "nixpkgs"
+        ],
         "nuenv": "nuenv"
       }
     },

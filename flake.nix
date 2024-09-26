@@ -1,17 +1,21 @@
 {
   description = "Personal clan configs.";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
+    nixpkgs.follows = "clan-core/nixpkgs";
     nuenv.url = "github:DeterminateSystems/nuenv";
     flake-utils.url = "github:numtide/flake-utils";
     lix-module = {
       url = "https://git.lix.systems/lix-project/nixos-module/archive/2.91.0.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, clan-core, flake-utils, lix-module, nuenv, ... }@inputs: let
+  outputs = { self, clan-core, flake-utils, nuenv, ... }@inputs: let
     debug = true;
     inherit (clan-core.inputs.nixpkgs) lib;
     mkOverlay = input: (final: prev: input.packages.${prev.stdenv.hostPlatform.system} );
@@ -59,10 +63,6 @@
         aio  = { imports = [ ./modules/shared.nix ./machines/aio/configuration.nix  ]; };
         fw   = { imports = [ ./modules/shared.nix ./machines/fw/configuration.nix   ]; };
           # clan.core = {
-          #   deployment.requireExplicitUpdate = false;
-          #   # machineDescription = "Framework Laptop";
-          #   # machineName = "fw";
-          #   # machineIcon = ./machines/${host}/icon.svg;
           #   # state = {}; # State directories to backup & restore
           #   # tags = ["laptop" "gnome"];
           #   # facts = {
@@ -107,13 +107,15 @@
             icon = "./machines/fw/icon.svg";
             tags = ["backup"];
             system = "x86_64-linux";
+            deploy.targetHost = "fw.local";
           };
           wyse = {
             name = "wyse";
             description = "Dell Wyse Mini Desktop";
             icon = "./machines/wyse/icon.svg";
-            tags = ["backup"];
+            tags = ["backup" "backup_server"];
             system = "x86_64-linux";
+            deploy.targetHost = "root@wyse.local";
           };
           aio = {
             name = "aio";
@@ -121,6 +123,7 @@
             icon = "./machines/aio/icon.svg";
             tags = ["backup"];
             system = "x86_64-linux";
+            deploy.targetHost = "root@aio.local";
           };
         };
 
@@ -129,10 +132,41 @@
         # Per-machine:  services.<serviceName>.<instanceName>.machines.<machineName>.config
         # Use any clanModule in inventory & add machines via: roles.default.*
         services = {
+          admin.instance_1 = { 
+            roles.default = {
+              tags = ["backup"];
+              config.allowedKeys = {
+                aio     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1iVBM368vGUuEWpHoYDwiD6pv8Tq1ZNGMdbD2jedUm sam@aio";
+                fw      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB2M80EUw0wQaBNutE06VNgSViVot6RL0O6iv2P1ewWH sam@fw";
+                wyse    = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA7++n5ihP5vR4zCMcCJVZfwTJYI2LPl7yple9Ga7JZK sam@wyse";
+                fajita0 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICtA7S/6BSsGRTTcKU/9+Aa/VsPCJzNkfjHbvFlaSVKN";
+                flame   = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILEUdU0TtRY9qdnJ/K0P/teEJ5OmTtY+utVkOqLVgh0Y";
+                cheetah = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHoHifjJL0fMBZDjNnXvSDhr0cwgkU80ybVeKRnly7Ku";
+              };
+            };
+          };
           # borgbackup.instance_1 = {
           #   roles.server.machines = ["wyse"];
           #   roles.server.tags = ["backup-server"];
           #   roles.client.tags = ["backup"];
+          # };
+          disk-id.instance_1 = {
+            roles.default.tags = ["backup"];
+          };
+          machine-id.instance_1 = {
+            roles.default.tags = ["backup"];
+          };
+          state-version.instance_1 = {
+            roles.default.tags = ["backup"];
+          };
+          # single-disk.default = {
+          #   meta.name = "single-disk";
+          #   roles.default.tags = ["backup"];
+          #   machines = {
+          #     aio.config.device = "/dev/sda";
+          #     fw.config.device = "/dev/nvme0n1";
+          #     wyse.config.device = "/dev/nvme0n1";
+          #   };
           # };
         };
       };

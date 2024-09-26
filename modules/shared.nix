@@ -7,6 +7,7 @@
 {
   imports = with clan-core.clanModules; [
     inputs.lix-module.nixosModules.default
+    inputs.nixos-generators.nixosModules.all-formats
 
     # --- clanModules ---
     localsend
@@ -96,8 +97,6 @@
   };
   # clan.core.networking.targetHost = "${user}@${config.networking.hostName}";
   #clan.single-disk.device = "/dev/disk/";
-  system.stateVersion = "24.05";
-  services.openssh.enable = true;
   # nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   # See: https://jade.fyi/blog/finding-functions-in-nixpkgs/
