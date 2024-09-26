@@ -20,25 +20,13 @@
     ./tailscale.nix
   ];
 
-  clan.core = {
-    deployment.requireExplicitUpdate = lib.mkDefault false;
-  };
-
-  clan.static-hosts = {
-    topLevelDomain = "lehman.run";
-    excludeHosts = ["nixos"];
-  };
-  clan.localsend = {
-    enable = true;
-    defaultLocation = "/home/${user}/Downloads";
-  };
+  clan.core.deployment.requireExplicitUpdate = lib.mkDefault false;
+  clan.static-hosts = { topLevelDomain="lehman.run"; excludeHosts=["nixos"]; };
+  clan.localsend    = { enable=true; defaultLocation="/home/${user}/Downloads"; };
 
   # After system installed/deployed use:
   # $ clan secrets get {machine_name}-user-password
-  clan.user-password = {
-    inherit user;
-    prompt = true;
-  };
+  clan.user-password = { inherit user; prompt=true; };
   users = {
     groups = {
       admins  = {};
@@ -53,17 +41,13 @@
     in {
       root.openssh.authorizedKeys.keys = keys;
       ${user} = {
-        # uid = 1000;
         group = user;
         isNormalUser = true;
-        extraGroups = ["wheel" "admins" "users"]; # "video" "audio" "input" "dialout" "disk" ];
+        extraGroups = ["wheel" "admins" "users"];
         openssh.authorizedKeys.keys = keys;
       };
     };
   };
-  # clan.core.networking.targetHost = "${user}@${config.networking.hostName}";
-  #clan.single-disk.device = "/dev/disk/";
-  # nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   # TODO: Map using nixosConfigurations
   programs.ssh.knownHosts = with inputs.self.nixosConfigurations; {
