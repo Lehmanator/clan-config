@@ -100,15 +100,8 @@
   # nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   # See: https://jade.fyi/blog/finding-functions-in-nixpkgs/
-  # TODO: Create separate module/profile for docs
-  # TODO: Is this necessary with Lix?
-  # TODO: Test in repl: `builtins.doc <func>` & `builtins.getDoc <func>`
-  nix = {
-    package = pkgs.lix;
-    extraOptions = ''
-      plugin-files = ${pkgs.nix-doc}/lib/libnix_doc_plugin.so
-    '';
-  };
+  # TODO: Create separate module/profile for Nix docs
+  nix.package = pkgs.lix;
   environment.systemPackages = [
     pkgs.manix    # Util to search Nix docs
     pkgs.nix-doc  # Nix plugin for getting docs on Nix libs
