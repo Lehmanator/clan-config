@@ -9,6 +9,9 @@
 
   clan.core.deployment.requireExplicitUpdate = lib.mkDefault false;
 
+  # Local service discovery & mDNS
+  services.avahi.enable = true;
+
   # After system installed/deployed use:
   # $ clan secrets get {machine_name}-user-password
   users = {
