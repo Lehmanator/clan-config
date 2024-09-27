@@ -67,7 +67,7 @@
             name = "fw";
             description = "Framework Laptop 13";
             icon = "./machines/fw/icon.svg";
-            tags = ["all" "laptop"];
+            tags = ["all" "laptop" "wifi"];
             system = "x86_64-linux";
             deploy.targetHost = "root@fw.local";
           };
@@ -75,7 +75,7 @@
             name = "wyse";
             description = "Dell Wyse Mini Desktop";
             icon = "./machines/wyse/icon.svg";
-            tags = ["all" "desktop" "backup"];
+            tags = ["all" "desktop" "backup" "wifi"];
             system = "x86_64-linux";
             deploy.targetHost = "root@wyse.local";
           };
@@ -83,7 +83,7 @@
             name = "aio";
             description = "Dell Inspiron All-in-One Desktop";
             icon = "./machines/aio/icon.svg";
-            tags = ["all" "desktop"];
+            tags = ["all" "desktop" "wifi"];
             system = "x86_64-linux";
             deploy.targetHost = "root@aio.local";
           };
@@ -104,6 +104,13 @@
             };
           };
           disk-id.instance_1.roles.default.tags = ["all"];
+          iwd.instance_1.roles.default = {
+            tags = ["wifi"];
+            config.networks = {
+              home.ssid = "Lehman"; 
+              hotspot.ssid = "hotspot-cheetah";
+            };
+          };
           localsend.instance_1.roles.default = {
             tags = ["all"];
             config.enable = true;
