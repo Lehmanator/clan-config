@@ -29,9 +29,9 @@
 
   # TODO: Map using nixosConfigurations
   programs.ssh.knownHosts = with inputs.self.nixosConfigurations; {
-     aio.publicKeyFile =  aio.config.clan.core.facts.services.openssh.public.path;
-      fw.publicKeyFile =   fw.config.clan.core.facts.services.openssh.public.path;
-    wyse.publicKeyFile = wyse.config.clan.core.facts.services.openssh.public.path;
+     aio.publicKeyFile =  aio.config.clan.core.facts.services.openssh.public."ssh.id_ed25519.pub".path;
+      fw.publicKeyFile =   fw.config.clan.core.facts.services.openssh.public."ssh.id_ed25519.pub".path;
+    wyse.publicKeyFile = wyse.config.clan.core.facts.services.openssh.public."ssh.id_ed25519.pub".path;
   };
 
   # See: https://jade.fyi/blog/finding-functions-in-nixpkgs/
