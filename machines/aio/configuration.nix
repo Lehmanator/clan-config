@@ -1,9 +1,9 @@
-{ config, ... }:
+{ inputs, config, ... }:
 {
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
-    ../../modules/gnome.nix
+    (inputs.self + /modules/gnome.nix)
   ];
 
   clan.localsend.ipv4Addr = "192.168.58.2/24";
