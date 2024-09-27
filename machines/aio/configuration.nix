@@ -1,4 +1,4 @@
-{ config, user, ... }:
+{ config, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -6,6 +6,7 @@
     ../../modules/gnome.nix
   ];
 
+  clan.localsend.ipv4Addr = "192.168.58.2/24";
   clan.core = {
     networking = {
       # buildHost = "root@wyse.local";

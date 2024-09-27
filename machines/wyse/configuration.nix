@@ -6,6 +6,7 @@
     ../../modules/gnome.nix
   ];
 
+  clan.localsend.ipv4Addr = "192.168.56.2/24";
   clan.core.networking = {
     # buildHost = "sam@fw.local";
     # Set this for clan commands use ssh i.e. `clan machines update`

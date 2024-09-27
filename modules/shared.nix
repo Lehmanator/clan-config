@@ -8,7 +8,6 @@
   ];
 
   clan.core.deployment.requireExplicitUpdate = lib.mkDefault false;
-  clan.localsend.defaultLocation = "/home/${config.clan.user-password.user}/Downloads";
 
   # After system installed/deployed use:
   # $ clan secrets get {machine_name}-user-password
