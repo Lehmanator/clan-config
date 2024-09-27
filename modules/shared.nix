@@ -3,6 +3,7 @@
   imports = with inputs; [
     lix-module.nixosModules.default
     nixos-generators.nixosModules.all-formats
+    ./clanModules-shared.nix
     ./tailscale.nix
   ];
 

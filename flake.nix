@@ -111,26 +111,8 @@
               hotspot.ssid = "hotspot-cheetah";
             };
           };
-          localsend.instance_1.roles.default = {
-            tags = ["all"];
-            config.enable = true;
-          };
           machine-id.instance_1.roles.default.tags = ["all"];
-          root-password.instance_1.roles.default.tags = ["all"];
-          sshd.instance_1.roles.default.tags = ["all"];
           state-version.instance_1.roles.default.tags = ["all"];
-          static-hosts.instance_1.roles.default = {
-            tags = ["all"];
-            config = {
-              topLevelDomain = "lehman.run";
-              excludeHosts = ["nixos"];
-            };
-          };
-          trusted-nix-caches.instance_1.roles.default.tags = ["all"];
-          user-password.instance_1.roles.default = {
-            config = { prompt=true; user="sam"; };
-            tags = ["all"];
-          };
         };
       };
     };
