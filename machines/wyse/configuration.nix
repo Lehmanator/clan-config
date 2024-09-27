@@ -19,7 +19,6 @@
   # - https://github.com/nix-community/disko/blob/master/example/luks-lvm.nix
   # ssh root@flash-installer.local lsblk --output NAME,ID-LINK,FSTYPE,SIZE,MOUNTPOINT
   disko.devices.disk.main.device = "/dev/disk/by-id/nvme-eui.0025385821413a6b";
-  nixpkgs.hostPlatform = "x86_64-linux";
 
   # This machine has an old Windows disk connected.
   #  so we'll temporarily allow using NTFS partitions at boot.
