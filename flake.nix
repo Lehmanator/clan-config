@@ -5,10 +5,6 @@
     flake-parts.follows = "clan-core/flake-parts";
     clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
     nuenv.url = "github:DeterminateSystems/nuenv";
-    lix-module = {
-      url = "https://git.lix.systems/lix-project/nixos-module/archive/2.91.0.tar.gz";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nixos-generators = { url = "github:nix-community/nixos-generators"; inputs.nixpkgs.follows = "nixpkgs"; };
     home-manager     = { url = "github:nix-community/home-manager";     inputs.nixpkgs.follows = "nixpkgs"; };
     haumea           = { url = "github:nix-community/haumea";           inputs.nixpkgs.follows = "nixpkgs"; };
