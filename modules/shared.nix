@@ -1,7 +1,6 @@
 { inputs, config, lib, pkgs, ... }:
 {
   imports = with inputs; [
-    lix-module.nixosModules.default
     nixos-generators.nixosModules.all-formats
     ./clanModules-shared.nix
     inputs.self.nixosProfiles.home-manager
