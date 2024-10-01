@@ -3,7 +3,7 @@
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
-    (inputs.self + /modules/gnome.nix)
+    inputs.self.nixosProfiles.gnome
   ];
 
   # TODO: Combine LVM, LUKS, BTRFS, interactive login, impermanence

@@ -3,7 +3,7 @@
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
-    (inputs.self + /modules/gnome.nix)
+    inputs.self.nixosProfiles.gnome
   ];
 
   clan.localsend.ipv4Addr = "192.168.56.2/24";

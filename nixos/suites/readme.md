@@ -1,0 +1,4 @@
+# nixosSuites
+
+Collections of `nixosProfiles`.
+

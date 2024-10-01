@@ -17,37 +17,71 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    haumea = {
+      url = "github:nix-community/haumea";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, clan-core, flake-utils, nuenv, ... }@inputs: let
+  outputs = { self, clan-core, flake-utils, haumea, home-manager, nixpkgs, nuenv, ... }@inputs: let
     debug = true;
-    inherit (clan-core.inputs.nixpkgs) lib;
-    mkOverlay = input: (final: prev: input.packages.${prev.stdenv.hostPlatform.system} );
-    mkPkgs = system: import clan-core.inputs.nixpkgs {
-      inherit system;
-      config = {
-        allowBroken = false;
-        allowUnfree = true;
-        allowUnsupportedSystem = true;
-      };
-      overlays = [
-        (mkOverlay clan-core)
-        nuenv.overlays.default
-      ];
+    nixpkgsConfig = {
+      allowBroken = false;
+      allowUnfree = true;
+      allowUnsupportedSystem = true;
     };
-
+    nixpkgsOverlays = [
+      (lib.mkOverlay clan-core)
+      nuenv.overlays.default
+    ];
+    lib =  nixpkgs.lib //
+       flake-utils.lib //
+            haumea.lib //
+      home-manager.lib //
+      { clan = clan-core.lib;
+        mkOverlay = input: (final: prev: input.packages.${prev.stdenv.hostPlatform.system} );
+        mkPkgs = system: import nixpkgs { inherit system; config=nixpkgsConfig; overlays=nixpkgsOverlays; };
+        mkConfigComponent = { 
+          configType       ? "eval",
+          configDirectory  ? "eval",
+          configLib        ? lib.evalModules,
+          specialArgsName  ? "extraSpecialArgs",
+          extraSpecialArgs ? {},
+          extraArgs        ? {},
+          extraModules     ? [],
+        }: let mkLoader = c: inputs.haumea.lib.load {
+            inputs = { inherit inputs; };
+            transformer = inputs.haumea.lib.transformers.liftDefault;
+            src = "${inputs.self}/${configDirectory}/${inputs.nixpkgs.lib.strings.toLower (if c=="Configurations" then "configs" else c)}";
+          };
+        in inputs.nixpkgs.lib.attrsets.mapAttrs' (n: v: lib.nameValuePair "${configType}${n}" v) (rec {
+          Modules           = mkLoader "modules";
+          Profiles          = mkLoader "profiles";
+          Suites            = mkLoader "suites";
+          ConfigurationsRaw = mkLoader "configs";
+          ConfigurationsAttrs = builtins.mapAttrs (_: cfg: extraArgs // {
+            "${specialArgsName}" = { inherit inputs; } // extraSpecialArgs;
+            modules = [cfg] ++ extraModules;
+          }) ConfigurationsRaw;
+          Configurations = builtins.mapAttrs (_: cfg: configLib ({
+            "${specialArgsName}" = { inherit inputs; } // extraSpecialArgs;
+            modules = [cfg] ++ extraModules;
+          } // extraArgs)) ConfigurationsRaw;
+        });
+    };
+    pkgs = lib.eachDefaultSystem lib.mkPkgs;
     overlays = rec {
-      clan    = mkOverlay clan-core;
-      self    = mkOverlay self;
+      clan    = lib.mkOverlay clan-core;
+      self    = lib.mkOverlay self;
       default = self;
     };
-    
+
     # Usage:
     # - https://docs.clan.lol
     # - https://docs.clan.lol/reference/nix-api/buildclan/
-    clan = clan-core.lib.buildClan {
+    clan = lib.clan.buildClan {
       directory = self;
-      pkgsForSystem = mkPkgs;
+      pkgsForSystem = lib.mkPkgs;
       specialArgs = { inherit inputs; };
       machines = {
         wyse = { imports = [ ./modules/shared.nix ./machines/wyse/configuration.nix ]; };
@@ -119,7 +153,7 @@
         };
       };
     };
-  in (flake-utils.lib.eachDefaultSystem (system: let pkgs = mkPkgs system; in
+  in (lib.eachDefaultSystem (system: let pkgs = lib.mkPkgs system; in
   {
     devShells = import ./shells   { inherit pkgs self; };
     packages  = import ./packages { inherit pkgs self; };
@@ -130,20 +164,57 @@
       vm-manager = { type="app"; program=pkgs.clan-vm-manager; meta.description="GTK app to manage clan VMs";   };
       webview-ui = { type="app"; program=pkgs.clan-webview-ui; meta.description="Web app to manage your clan";  };
     };
-  })) // {
+  }))
+  // (lib.optionalAttrs debug {
+    inherit (clan) clanInternals;
+    inherit (clan.clanInternals) clanModules;
+    inherit (clan-core) flakeModules templates;
+    inherit inputs;
+    inherit 
+      lib
+      overlays
+    ;
+  })
+  // (lib.mkConfigComponent {
+    configType      = "home";
+    configDirectory = "hm";
+    configLib       = inputs.home-manager.lib.homeManagerConfiguration;
+    specialArgsName = "extraSpecialArgs";
+    extraModules    = [{
+      home = lib.mkDefault (rec {
+        stateVersion  = "24.11";
+        username      = "sam";
+        homeDirectory = "/home/${username}";
+      });
+    }];
+    extraArgs = {
+      inherit lib;
+      pkgs = import inputs.nixpkgs { config = nixpkgsConfig; overlays = nixpkgsOverlays; };
+    };
+  })
+  // (lib.mkConfigComponent {
+      configType      = "nixos";
+      configLib       = inputs.nixpkgs.lib.nixosSystem;
+      configDirectory = "nixos";
+      specialArgsName = "specialArgs";
+    })
+  # // (lib.mkConfigComponent {
+  #   configType       = "nixOnDroid";
+  #   configLib        = inputs.nix-on-droid.lib.nixOnDroidConfiguration;
+  #   configDirectory  = "nod";
+  #   specialArgsName  = "extraSpecialArgs";
+  #   extraArgs        = {
+  #     home-manager-path = inputs.home-manager.outPath;
+  #     pkgs = import inputs.nixpkgs { config = nixpkgsConfig; overlays = nixpkgsOverlays; };
+  #   };
+  # })
+  // {
     # Inherit installer config from upstream clan-core.
     # TODO: Auto-add SSH keys from other machines.
+    inherit (clan-core) nixosModules;
     nixosConfigurations = clan.nixosConfigurations // {
       inherit (clan-core.nixosConfigurations) flash-installer;
     };
-  } // lib.optionalAttrs debug {
-    inherit (clan) clanInternals clanModules flakeModules;
-    inherit (clan-core) nixosModules templates;
-    inherit inputs;
-    inherit overlays;
-    lib = lib // {
-      clan = clan-core.lib;
-      flake-utils = flake-utils.lib;
-    };
-  };
+  } 
+  ;
 }

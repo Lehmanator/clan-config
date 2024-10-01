@@ -4,8 +4,8 @@
     lix-module.nixosModules.default
     nixos-generators.nixosModules.all-formats
     ./clanModules-shared.nix
-    ./home-manager.nix
-    ./tailscale.nix
+    inputs.self.nixosProfiles.home-manager
+    inputs.self.nixosProfiles.tailscale
   ];
 
   clan.core.deployment.requireExplicitUpdate = lib.mkDefault false;
