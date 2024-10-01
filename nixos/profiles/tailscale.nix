@@ -1,3 +1,4 @@
+{ inputs, ... }:
 { config, lib, pkgs, ... }:
 let
   inherit (lib) concatStringsSep mkBefore mkIf optional optionals;
