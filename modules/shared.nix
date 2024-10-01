@@ -4,6 +4,7 @@
     lix-module.nixosModules.default
     nixos-generators.nixosModules.all-formats
     ./clanModules-shared.nix
+    ./home-manager.nix
     ./tailscale.nix
   ];
 

@@ -13,6 +13,10 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, clan-core, flake-utils, nuenv, ... }@inputs: let
@@ -59,8 +63,7 @@
         meta = {
           name = "Lehmanator";
           description = "Personal clan configs";
-          # icon = "${inputs.self}/icon.png";  
-          # icon = ./icon.png;
+          # icon = "./icon.png";
         };
         machines = {
           fw = {
