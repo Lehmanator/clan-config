@@ -1,6 +1,8 @@
 { nuenv
-, lib
 , formats
+, lib
+, root, super, self
+, ...
 }:
 let
   boot-keybinds.oems = [

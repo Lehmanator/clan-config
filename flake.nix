@@ -1,17 +1,21 @@
-{
-  description = "Personal clan configs.";
+{ description = "Personal clan configs.";
   inputs = {
     nixpkgs.follows = "clan-core/nixpkgs";
     flake-parts.follows = "clan-core/flake-parts";
+
     clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
+
     nuenv.url = "github:DeterminateSystems/nuenv";
     nixos-generators = { url = "github:nix-community/nixos-generators"; inputs.nixpkgs.follows = "nixpkgs"; };
     home-manager     = { url = "github:nix-community/home-manager";     inputs.nixpkgs.follows = "nixpkgs"; };
     haumea           = { url = "github:nix-community/haumea";           inputs.nixpkgs.follows = "nixpkgs"; };
   };
 
-  outputs = { self, clan-core, flake-parts, haumea, home-manager, nixpkgs, ... }@inputs:
-  (flake-parts.lib.mkFlake { inherit inputs; } ({config, lib, ... }: 
+  outputs = { self, clan-core, flake-parts, haumea, nixpkgs, ... }@inputs:
+  (flake-parts.lib.mkFlake { inherit inputs self; } ({config, lib, ... }: 
+  let
+    renamePkgs = prefix: lib.mapAttrs' (n: v: lib.nameValuePair "${prefix}${lib.removePrefix prefix n}" v);
+  in
   {
     # Usage:
     # - https://docs.clan.lol
@@ -24,24 +28,14 @@
       ./nixos
     ];
     clan = {
+      # Share `nixpkgs` between all systems. 
+      # - Speeds up eval
+      # - Removes options: `nixpkgs.*`
+      # - Applies config & overlays
+      pkgsForSystem = import ./nixpkgs.nix inputs;
       directory = inputs.self;
       specialArgs = { inherit inputs self; };
-      pkgsForSystem = system: import inputs.nixpkgs {
-        inherit system;
-        overlays = [
-          inputs.nuenv.overlays.default
-        ];
-        config = {
-          allowBroken = false;
-          allowUnfree = true;
-          allowUnsupportedSystem = true;
-        };
-      };
-      meta = {
-        name = "Lehmanator";
-        # description = "Personal clan configs";
-        # icon = "./icon.png";
-      };
+      meta.name = "Lehmanator";
       machines = {
         wyse = { imports = [ ./modules/shared.nix ./machines/wyse/configuration.nix ]; };
         aio  = { imports = [ ./modules/shared.nix ./machines/aio/configuration.nix  ]; };
@@ -113,6 +107,10 @@
       };
     };
     perSystem = { pkgs, system, inputs', self', ... }: {
+
+      # Use our custom nixpkgs with overlays and config applied.
+      _module.args.pkgs = config.clan.pkgsForSystem system;
+
       apps = {
         app        = { type="app"; program=self'.packages.clan-app;        meta.description="GTK app to manage your clan";  };
         cli        = { type="app"; program=self'.packages.clan-cli;        meta.description="CLI to manage your clan";      };
@@ -120,25 +118,27 @@
         vm-manager = { type="app"; program=self'.packages.clan-vm-manager; meta.description="GTK app to manage clan VMs";   };
         webview-ui = { type="app"; program=self'.packages.clan-webview-ui; meta.description="Web app to manage your clan";  };
       };
-      packages = with inputs'.clan-core.packages; {
-        inherit (inputs'.clan-core.packages) clan-app clan-cli clan-cli-docs clan-vm-manager;
-        clan-webview-ui = webview-ui;
-        clan-module-docs = module-docs;
-        clan-module-schema = module-schema;
-        clan-inventory-api-docs = inventory-api-docs;
-        clan-inventory-schema = inventory-schema-pretty;
-        clan-inventory-abstract = inventory-schema-abstract;
-        clan-function-schema = function-schema;
-        clan-codium = editor;
-        clan-docs = docs;
-      };
-    };
-    flake = {
-      inherit inputs;
 
-      # Inherit installer config from upstream clan-core.
+      devShells = inputs'.clan-core.devShells;
+      packages = (haumea.lib.load {
+        src = ./packages;
+        loader = haumea.lib.loaders.callPackage;
+        inputs = (builtins.removeAttrs pkgs ["root" "self" "super"]) //
+          inputs'.clan-core.packages // {
+            flakePath = self.outPath;
+          }
+        ;
+      })
+      // (renamePkgs "clan-" inputs'.clan-core.packages)
+      ;
+    };
+
+    flake = {
+      inherit inputs self;
+
+      # Inherit nixosConfigurations.installer from upstream clan-core.
       # TODO: Auto-add SSH keys from other machines.
-      nixosConfigurations.clan-installer = inputs.clan-core.nixosConfigurations.flash-installer;
+      nixosConfigurations.clan-installer = clan-core.nixosConfigurations.installer;
     };
   }));
 }
