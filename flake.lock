@@ -12,35 +12,15 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1728262668,
-        "narHash": "sha256-o4NQEWBeV4S5OFGPdrz2cVvAWY0lowLQTfCuq0QV5s0=",
-        "rev": "8004d9910bd2397e1c12a1c648b34ebcd8e94020",
+        "lastModified": 1728335661,
+        "narHash": "sha256-ra3IYJJbHyRDZb1S/bqIRMs32dMKrDbh+aZzldRwqWQ=",
+        "rev": "899bfde40cc0d41bc82b94adab1644b71c71967f",
         "type": "tarball",
-        "url": "https://git.clan.lol/api/v1/repos/clan/clan-core/archive/8004d9910bd2397e1c12a1c648b34ebcd8e94020.tar.gz"
+        "url": "https://git.clan.lol/api/v1/repos/clan/clan-core/archive/899bfde40cc0d41bc82b94adab1644b71c71967f.tar.gz"
       },
       "original": {
         "type": "tarball",
         "url": "https://git.clan.lol/clan/clan-core/archive/main.tar.gz"
-      }
-    },
-    "devshell": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1728330715,
-        "narHash": "sha256-xRJ2nPOXb//u1jaBnDP56M7v5ldavjbtR6lfGqSvcKg=",
-        "owner": "numtide",
-        "repo": "devshell",
-        "rev": "dd6b80932022cea34a019e2bb32f6fa9e494dfef",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "devshell",
-        "type": "github"
       }
     },
     "disko": {
@@ -130,11 +110,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1728306985,
-        "narHash": "sha256-l/KpcWTv2SjxCnqFs5GYhvjeVYd40WQV4/F2+w9btd4=",
+        "lastModified": 1728335212,
+        "narHash": "sha256-iQTkbf88OZs8oZaZduq+qa0PXEgD0mHGEcuGy5BoLUs=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "3ac39b2a8b7cbfc0f96628d8a84867c885bc988b",
+        "rev": "271c83e21ea81f39a42ad128384e0e6804956a88",
         "type": "github"
       },
       "original": {
@@ -270,7 +250,6 @@
     "root": {
       "inputs": {
         "clan-core": "clan-core",
-        "devshell": "devshell",
         "flake-parts": [
           "clan-core",
           "flake-parts"
