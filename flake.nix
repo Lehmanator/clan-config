@@ -138,7 +138,7 @@
 
       # Inherit nixosConfigurations.installer from upstream clan-core.
       # TODO: Auto-add SSH keys from other machines.
-      nixosConfigurations.clan-installer = clan-core.nixosConfigurations.installer;
+      nixosConfigurations.clan-installer = clan-core.nixosConfigurations.flash-installer;
     };
   }));
 }
