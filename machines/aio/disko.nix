@@ -79,7 +79,7 @@ in
       lvs = {
         # nix-store & persistence
         nix = {
-          size = "128G";
+          size = "256G";
           content = {
             type = "filesystem";
             format = "ext4";

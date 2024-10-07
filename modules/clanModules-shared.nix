@@ -3,7 +3,7 @@
   imports = with inputs.clan-core.clanModules; [
     localsend             # Tags: all | gui ?
     root-password         # Tags: all
-    sshd                  # Tags: all
+    # sshd                  # Tags: all
     static-hosts          # Tags: all
     trusted-nix-caches    # Tags: all
     user-password         # Tags: all

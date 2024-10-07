@@ -9,6 +9,7 @@
     nixos-generators = { url = "github:nix-community/nixos-generators"; inputs.nixpkgs.follows = "nixpkgs"; };
     home-manager     = { url = "github:nix-community/home-manager";     inputs.nixpkgs.follows = "nixpkgs"; };
     haumea           = { url = "github:nix-community/haumea";           inputs.nixpkgs.follows = "nixpkgs"; };
+    devshell         = { url = "github:numtide/devshell";               inputs.nixpkgs.follows = "nixpkgs"; };
   };
 
   outputs = { self, clan-core, flake-parts, haumea, nixpkgs, ... }@inputs:
@@ -17,23 +18,17 @@
     renamePkgs = prefix: lib.mapAttrs' (n: v: lib.nameValuePair "${prefix}${lib.removePrefix prefix n}" v);
   in
   {
-    # Usage:
-    # - https://docs.clan.lol
-    # - https://docs.clan.lol/reference/nix-api/buildclan/
     debug = true;
     systems = ["x86_64-linux" "aarch64-linux"];
     imports = [
       clan-core.flakeModules.default
       ./hm
       ./nixos
+      ./shells
     ];
     clan = {
-      # Share `nixpkgs` between all systems. 
-      # - Speeds up eval
-      # - Removes options: `nixpkgs.*`
-      # - Applies config & overlays
       pkgsForSystem = import ./nixpkgs.nix inputs;
-      directory = inputs.self;
+      directory = self;
       specialArgs = { inherit inputs self; };
       meta.name = "Lehmanator";
       machines = {
@@ -107,10 +102,7 @@
       };
     };
     perSystem = { pkgs, system, inputs', self', ... }: {
-
-      # Use our custom nixpkgs with overlays and config applied.
       _module.args.pkgs = config.clan.pkgsForSystem system;
-
       apps = {
         app        = { type="app"; program=self'.packages.clan-app;        meta.description="GTK app to manage your clan";  };
         cli        = { type="app"; program=self'.packages.clan-cli;        meta.description="CLI to manage your clan";      };
@@ -135,9 +127,6 @@
 
     flake = {
       inherit inputs self;
-
-      # Inherit nixosConfigurations.installer from upstream clan-core.
-      # TODO: Auto-add SSH keys from other machines.
       nixosConfigurations.clan-installer = clan-core.nixosConfigurations.installer;
     };
   }));
