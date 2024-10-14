@@ -37,7 +37,13 @@
   environment.systemPackages = [
     pkgs.adwaita-icon-theme
     pkgs.gnomeExtensions.appindicator
+    pkgs.gnomeExtensions.valent
+    pkgs.valent
   ];
+  networking.firewall = {
+    allowedTCPPortRanges = [{ from=1714; to=1764; }];
+    allowedUDPPortRanges = [{ from=1714; to=1764; }];
+  };
   
   # Declarative Profile Picture
   # TODO: Use path relative to config.clan.core.clanDir
