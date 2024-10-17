@@ -17,7 +17,10 @@
   in
   {
     core.networking.zerotier.networkId = networkId;
-    localsend.defaultLocation = "/home/${config.clan.user-password.user}/Downloads";
+    localsend = {
+      # displayName = config.networking.hostName;
+      ipv4Addr = "192.168.56.2/24";
+    };
     static-hosts = {
       topLevelDomain = "lehman.run";
       excludeHosts = ["nixos"];

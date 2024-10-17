@@ -59,7 +59,6 @@
             description = "Framework Laptop 13";
             icon = "./machines/fw/icon.svg";
             tags = ["all" "laptop" "wifi"];
-            system = "x86_64-linux";
             deploy.targetHost = "root@fw.local";
           };
           wyse = {
@@ -67,7 +66,6 @@
             description = "Dell Wyse Mini Desktop";
             icon = "./machines/wyse/icon.svg";
             tags = ["all" "desktop" "backup" "wifi"];
-            system = "x86_64-linux";
             deploy.targetHost = "root@wyse.local";
           };
           aio = {
@@ -75,7 +73,6 @@
             description = "Dell Inspiron All-in-One Desktop";
             icon = "./machines/aio/icon.svg";
             tags = ["all" "desktop" "wifi"];
-            system = "x86_64-linux";
             deploy.targetHost = "root@aio.local";
           };
         };
