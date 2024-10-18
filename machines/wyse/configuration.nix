@@ -31,4 +31,5 @@
   #   options = ["rw" "uid=1000"];
   # };
   boot.supportedFilesystems = ["ntfs"];
+  boot.plymouth.enable = true;
 }
