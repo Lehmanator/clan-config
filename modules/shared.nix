@@ -40,6 +40,7 @@
   # See: https://jade.fyi/blog/finding-functions-in-nixpkgs/
   # TODO: Create separate module/profile for Nix docs
   nix.package = pkgs.lix;
+  nix.settings.experimental-features = ["nix-command" "flakes" "repl-flake"];
   environment.systemPackages = [
     pkgs.manix    # Util to search Nix docs
     pkgs.nix-doc  # Nix plugin for getting docs on Nix libs
