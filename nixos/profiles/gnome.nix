@@ -36,6 +36,7 @@
   };
   environment.systemPackages = [
     pkgs.adwaita-icon-theme
+    pkgs.gnome-tweaks
     pkgs.gnomeExtensions.appindicator
     pkgs.gnomeExtensions.valent
     pkgs.valent
