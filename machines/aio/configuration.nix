@@ -4,6 +4,7 @@
     ./hardware-configuration.nix
     ./disko.nix
     inputs.self.nixosProfiles.gnome
+    inputs.self.nixosProfiles.uefi
   ];
 
   # TODO: Combine LVM, LUKS, BTRFS, interactive login, impermanence

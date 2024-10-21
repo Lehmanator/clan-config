@@ -4,6 +4,8 @@
     ./hardware-configuration.nix
     ./disko.nix
     inputs.self.nixosProfiles.gnome
+    inputs.self.nixosProfiles.uefi
+    # inputs.self.nixosProfiles.displaylink
   ];
 
   clan.localsend.ipv4Addr = "192.168.56.2/24";
@@ -31,5 +33,4 @@
   #   options = ["rw" "uid=1000"];
   # };
   boot.supportedFilesystems = ["ntfs"];
-  boot.plymouth.enable = true;
 }
