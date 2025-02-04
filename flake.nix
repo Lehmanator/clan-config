@@ -119,6 +119,7 @@
             };
           };
           machine-id.default.roles.default.tags = ["all"];
+          root-password.default.roles.default.tags = ["all"];
           single-disk = {
             hdd.roles.default = {
               tags = ["hdd"];
@@ -129,7 +130,6 @@
               config.device = "/dev/nvme0n1";
             };
           };
-          root-password.default.roles.default.tags = ["all"];
           state-version.default.roles.default.tags = ["all"];
           user-password.sam.roles.default = {
             tags = ["all"];
