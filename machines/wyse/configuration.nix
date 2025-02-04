@@ -1,10 +1,4 @@
 {config, ...}: {
-  imports = [
-    ./hardware-configuration.nix
-    ./disko.nix
-    # inputs.self.nixosProfiles.displaylink
-  ];
-
   clan.localsend.ipv4Addr = "192.168.56.2/24";
   clan.core.networking.zerotier = {
     controller = {

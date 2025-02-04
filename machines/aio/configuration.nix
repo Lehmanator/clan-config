@@ -1,9 +1,4 @@
-{inputs, ...}: {
-  imports = [
-    ./hardware-configuration.nix
-    ./disko.nix
-  ];
-
+{...}: {
   # TODO: Combine LVM, LUKS, BTRFS, interactive login, impermanence
   # - https://github.com/nix-community/disko/blob/master/example/luks-btrfs-subvolumes.nix
   # - https://github.com/nix-community/disko/blob/master/example/luks-interactive-login.nix
