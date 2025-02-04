@@ -7,7 +7,6 @@
 }: {
   imports = with inputs.clan-core.clanModules; [
     localsend # Tags: all | gui ?
-    sshd # Tags: all
     static-hosts # Tags: all
     trusted-nix-caches # Tags: all
     zerotier-static-peers # Tags: all

@@ -130,6 +130,19 @@
               config.device = "/dev/nvme0n1";
             };
           };
+          sshd.default.roles = {
+            client = {
+              tags = ["all"];
+              config.certificate.searchDomains = ["lehman.run"];
+            };
+            server = {
+              tags = ["all"];
+              config = {
+                certificate.searchDomains = ["lehman.run"];
+                hostKeys.rsa.enable = true;
+              };
+            };
+          };
           state-version.default.roles.default.tags = ["all"];
           user-password.sam.roles.default = {
             tags = ["all"];
