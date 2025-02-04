@@ -99,7 +99,7 @@
         };
 
         services = {
-          admin.instance_1.roles.default = {
+          admin.sam.roles.default = {
             tags = ["all"];
             config.allowedKeys = {
               aio = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1iVBM368vGUuEWpHoYDwiD6pv8Tq1ZNGMdbD2jedUm sam@aio";
@@ -110,17 +110,17 @@
               cheetah = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHoHifjJL0fMBZDjNnXvSDhr0cwgkU80ybVeKRnly7Ku";
             };
           };
-          disk-id.instance_1.roles.default.tags = ["all"];
-          iwd.instance_1.roles.default = {
+          disk-id.default.roles.default.tags = ["all"];
+          iwd.default.roles.default = {
             tags = ["wifi"];
             config.networks = {
               home.ssid = "Lehman";
               hotspot.ssid = "hotspot-cheetah";
             };
           };
-          machine-id.instance_1.roles.default.tags = ["all"];
-          state-version.instance_1.roles.default.tags = ["all"];
-          user-password.instance_1.roles.default = {
+          machine-id.default.roles.default.tags = ["all"];
+          state-version.default.roles.default.tags = ["all"];
+          user-password.sam.roles.default = {
             tags = ["all"];
             config.user = "sam";
           };
