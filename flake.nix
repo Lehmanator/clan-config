@@ -129,6 +129,7 @@
               config.device = "/dev/nvme0n1";
             };
           };
+          root-password.default.roles.default.tags = ["all"];
           state-version.default.roles.default.tags = ["all"];
           user-password.sam.roles.default = {
             tags = ["all"];
