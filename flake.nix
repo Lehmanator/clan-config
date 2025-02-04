@@ -69,6 +69,13 @@
           # icon = "./icon.png";
         };
         machines = {
+          aio = {
+            name = "aio";
+            description = "Dell Inspiron All-in-One Desktop";
+            icon = ./machines/aio/icon.svg;
+            tags = ["all" "desktop" "hdd" "server" "wifi"];
+            deploy.targetHost = "root@aio.local";
+          };
           fw = {
             name = "fw";
             description = "Framework Laptop 13";
@@ -82,13 +89,6 @@
             icon = ./machines/wyse/icon.svg;
             tags = ["all" "backup" "desktop" "server" "nvme" "wifi"];
             deploy.targetHost = "root@wyse.local";
-          };
-          aio = {
-            name = "aio";
-            description = "Dell Inspiron All-in-One Desktop";
-            icon = ./machines/aio/icon.svg;
-            tags = ["all" "desktop" "hdd" "server" "wifi"];
-            deploy.targetHost = "root@aio.local";
           };
         };
 
