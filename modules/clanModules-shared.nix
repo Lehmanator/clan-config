@@ -10,7 +10,6 @@
     sshd # Tags: all
     static-hosts # Tags: all
     trusted-nix-caches # Tags: all
-    user-password # Tags: all
     zerotier-static-peers # Tags: all
     zt-tcp-relay # Tags: all | portable
   ];
@@ -26,10 +25,6 @@
     static-hosts = {
       topLevelDomain = "lehman.run";
       excludeHosts = ["nixos"];
-    };
-    user-password = {
-      prompt = true;
-      user = "sam";
     };
     zt-tcp-relay.port = 4443;
     zerotier-static-peers = {
