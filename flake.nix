@@ -1,4 +1,5 @@
-{ description = "Personal clan configs.";
+{
+  description = "Personal clan configs.";
   inputs = {
     nixpkgs.follows = "clan-core/nixpkgs";
     flake-parts.follows = "clan-core/flake-parts";
@@ -6,18 +7,38 @@
     clan-core.url = "https://git.clan.lol/clan/clan-core/archive/main.tar.gz";
 
     nuenv.url = "github:DeterminateSystems/nuenv";
-    nixos-generators = { url = "github:nix-community/nixos-generators"; inputs.nixpkgs.follows = "nixpkgs"; };
-    home-manager     = { url = "github:nix-community/home-manager";     inputs.nixpkgs.follows = "nixpkgs"; };
-    haumea           = { url = "github:nix-community/haumea";           inputs.nixpkgs.follows = "nixpkgs"; };
-    lanzaboote       = { url = "github:nix-community/lanzaboote";       inputs.nixpkgs.follows = "nixpkgs"; };
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    haumea = {
+      url = "github:nix-community/haumea";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, clan-core, flake-parts, haumea, nixpkgs, ... }@inputs:
-  (flake-parts.lib.mkFlake { inherit inputs self; } ({config, lib, ... }: 
-  let
+  outputs = {
+    self,
+    clan-core,
+    flake-parts,
+    haumea,
+    nixpkgs,
+    ...
+  } @ inputs: (flake-parts.lib.mkFlake {inherit inputs self;} ({
+    config,
+    lib,
+    ...
+  }: let
     renamePkgs = prefix: lib.mapAttrs' (n: v: lib.nameValuePair "${prefix}${lib.removePrefix prefix n}" v);
-  in
-  {
+  in {
     # Usage:
     # - https://docs.clan.lol
     # - https://docs.clan.lol/reference/nix-api/buildclan/
@@ -29,18 +50,18 @@
       ./nixos
     ];
     clan = {
-      # Share `nixpkgs` between all systems. 
+      inherit self;
+      # Share `nixpkgs` between all systems.
       # - Speeds up eval
       # - Removes options: `nixpkgs.*`
       # - Applies config & overlays
       pkgsForSystem = import ./nixpkgs.nix inputs;
-      directory = inputs.self;
-      specialArgs = { inherit inputs self; };
+      specialArgs = {inherit inputs self;};
       meta.name = "Lehmanator";
       machines = {
-        wyse = { imports = [ ./modules/shared.nix ./machines/wyse/configuration.nix ]; };
-        aio  = { imports = [ ./modules/shared.nix ./machines/aio/configuration.nix  ]; };
-        fw   = { imports = [ ./modules/shared.nix ./machines/fw/configuration.nix   ]; };
+        wyse = {imports = [./modules/shared.nix ./machines/wyse/configuration.nix];};
+        aio = {imports = [./modules/shared.nix ./machines/aio/configuration.nix];};
+        fw = {imports = [./modules/shared.nix ./machines/fw/configuration.nix];};
       };
 
       # Inventory Docs:
@@ -78,24 +99,22 @@
         };
 
         services = {
-          admin.instance_1 = { 
-            roles.default = {
-              tags = ["all"];
-              config.allowedKeys = {
-                aio     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1iVBM368vGUuEWpHoYDwiD6pv8Tq1ZNGMdbD2jedUm sam@aio";
-                fw      = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB2M80EUw0wQaBNutE06VNgSViVot6RL0O6iv2P1ewWH sam@fw";
-                wyse    = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA7++n5ihP5vR4zCMcCJVZfwTJYI2LPl7yple9Ga7JZK sam@wyse";
-                fajita0 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICtA7S/6BSsGRTTcKU/9+Aa/VsPCJzNkfjHbvFlaSVKN";
-                flame   = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILEUdU0TtRY9qdnJ/K0P/teEJ5OmTtY+utVkOqLVgh0Y";
-                cheetah = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHoHifjJL0fMBZDjNnXvSDhr0cwgkU80ybVeKRnly7Ku";
-              };
+          admin.instance_1.roles.default = {
+            tags = ["all"];
+            config.allowedKeys = {
+              aio = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1iVBM368vGUuEWpHoYDwiD6pv8Tq1ZNGMdbD2jedUm sam@aio";
+              fw = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB2M80EUw0wQaBNutE06VNgSViVot6RL0O6iv2P1ewWH sam@fw";
+              wyse = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA7++n5ihP5vR4zCMcCJVZfwTJYI2LPl7yple9Ga7JZK sam@wyse";
+              fajita0 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICtA7S/6BSsGRTTcKU/9+Aa/VsPCJzNkfjHbvFlaSVKN";
+              flame = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILEUdU0TtRY9qdnJ/K0P/teEJ5OmTtY+utVkOqLVgh0Y";
+              cheetah = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHoHifjJL0fMBZDjNnXvSDhr0cwgkU80ybVeKRnly7Ku";
             };
           };
           disk-id.instance_1.roles.default.tags = ["all"];
           iwd.instance_1.roles.default = {
             tags = ["wifi"];
             config.networks = {
-              home.ssid = "Lehman"; 
+              home.ssid = "Lehman";
               hotspot.ssid = "hotspot-cheetah";
             };
           };
@@ -104,31 +123,57 @@
         };
       };
     };
-    perSystem = { pkgs, system, inputs', self', ... }: {
-
+    perSystem = {
+      pkgs,
+      system,
+      inputs',
+      self',
+      ...
+    }: {
       # Use our custom nixpkgs with overlays and config applied.
       _module.args.pkgs = config.clan.pkgsForSystem system;
 
       apps = {
-        app        = { type="app"; program=self'.packages.clan-app;        meta.description="GTK app to manage your clan";  };
-        cli        = { type="app"; program=self'.packages.clan-cli;        meta.description="CLI to manage your clan";      };
-        default    = { type="app"; program=self'.packages.clan-cli;        meta.description="CLI to manage your clan";      };
-        vm-manager = { type="app"; program=self'.packages.clan-vm-manager; meta.description="GTK app to manage clan VMs";   };
-        webview-ui = { type="app"; program=self'.packages.clan-webview-ui; meta.description="Web app to manage your clan";  };
+        app = {
+          type = "app";
+          program = self'.packages.clan-app;
+          meta.description = "GTK app to manage your clan";
+        };
+        cli = {
+          type = "app";
+          program = self'.packages.clan-cli;
+          meta.description = "CLI to manage your clan";
+        };
+        default = {
+          type = "app";
+          program = self'.packages.clan-cli;
+          meta.description = "CLI to manage your clan";
+        };
+        vm-manager = {
+          type = "app";
+          program = self'.packages.clan-vm-manager;
+          meta.description = "GTK app to manage clan VMs";
+        };
+        webview-ui = {
+          type = "app";
+          program = self'.packages.clan-webview-ui;
+          meta.description = "Web app to manage your clan";
+        };
       };
 
       devShells = inputs'.clan-core.devShells;
-      packages = (haumea.lib.load {
-        src = ./packages;
-        loader = haumea.lib.loaders.callPackage;
-        inputs = (builtins.removeAttrs pkgs ["root" "self" "super"]) //
-          inputs'.clan-core.packages // {
-            flakePath = self.outPath;
-          }
-        ;
-      })
-      // (renamePkgs "clan-" inputs'.clan-core.packages)
-      ;
+      packages =
+        (haumea.lib.load {
+          src = ./packages;
+          loader = haumea.lib.loaders.callPackage;
+          inputs =
+            (builtins.removeAttrs pkgs ["root" "self" "super"])
+            // inputs'.clan-core.packages
+            // {
+              flakePath = self.outPath;
+            };
+        })
+        // (renamePkgs "clan-" inputs'.clan-core.packages);
     };
 
     flake = {
