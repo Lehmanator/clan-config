@@ -79,21 +79,21 @@
             name = "fw";
             description = "Framework Laptop 13";
             icon = "./machines/fw/icon.svg";
-            tags = ["all" "laptop" "wifi"];
+            tags = ["all" "laptop" "nvme" "wifi"];
             deploy.targetHost = "root@fw.local";
           };
           wyse = {
             name = "wyse";
             description = "Dell Wyse Mini Desktop";
             icon = "./machines/wyse/icon.svg";
-            tags = ["all" "desktop" "backup" "wifi"];
+            tags = ["all" "desktop" "backup" "nvme" "wifi"];
             deploy.targetHost = "root@wyse.local";
           };
           aio = {
             name = "aio";
             description = "Dell Inspiron All-in-One Desktop";
             icon = "./machines/aio/icon.svg";
-            tags = ["all" "desktop" "wifi"];
+            tags = ["all" "desktop" "hdd" "wifi"];
             deploy.targetHost = "root@aio.local";
           };
         };
@@ -119,6 +119,16 @@
             };
           };
           machine-id.default.roles.default.tags = ["all"];
+          single-disk = {
+            hdd.roles.default = {
+              tags = ["hdd"];
+              config.device = "/dev/hda";
+            };
+            nvme.roles.default = {
+              tags = ["nvme"];
+              config.device = "/dev/nvme0n1";
+            };
+          };
           state-version.default.roles.default.tags = ["all"];
           user-password.sam.roles.default = {
             tags = ["all"];
