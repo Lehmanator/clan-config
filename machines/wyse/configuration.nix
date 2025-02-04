@@ -1,5 +1,8 @@
-{ inputs, config, ... }:
 {
+  inputs,
+  config,
+  ...
+}: {
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
@@ -10,8 +13,11 @@
 
   clan.localsend.ipv4Addr = "192.168.56.2/24";
   clan.core.networking.zerotier = {
-    controller = { enable = true; public = false; };
-    networkId = builtins.readFile "${config.clan.core.clanDir}/machines/${config.networking.hostName}/facts/zerotier-network-id";
+    controller = {
+      enable = true;
+      public = false;
+    };
+    networkId = builtins.readFile "${config.clan.core.settings.directory}/machines/${config.networking.hostName}/facts/zerotier-network-id";
     # moon.stableEndpoints = [ "home" ];
   };
 

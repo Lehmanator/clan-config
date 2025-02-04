@@ -1,8 +1,11 @@
-{ inputs, ... }:
-{ config, lib, pkgs, ... }:
-{
+{inputs, ...}: {
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   services = {
-    displayManager.autoLogin = { 
+    displayManager.autoLogin = {
       inherit (config.clan.user-password) user;
       enable = lib.mkDefault false;
     };
@@ -21,7 +24,7 @@
       tracker.enable = true;
     };
     sysprof.enable = true;
-    udev.packages = [ pkgs.gnome-settings-daemon ];
+    udev.packages = [pkgs.gnome-settings-daemon];
   };
 
   systemd.services = lib.mkIf config.services.displayManager.autoLogin.enable {
@@ -42,12 +45,22 @@
     pkgs.valent
   ];
   networking.firewall = {
-    allowedTCPPortRanges = [{ from=1714; to=1764; }];
-    allowedUDPPortRanges = [{ from=1714; to=1764; }];
+    allowedTCPPortRanges = [
+      {
+        from = 1714;
+        to = 1764;
+      }
+    ];
+    allowedUDPPortRanges = [
+      {
+        from = 1714;
+        to = 1764;
+      }
+    ];
   };
-  
+
   # Declarative Profile Picture
-  # TODO: Use path relative to config.clan.core.clanDir
+  # TODO: Use path relative to config.clan.core.settings.directory
   system.activationScripts.script.text = let
     profile-pic = inputs.self + /icon.png;
     #cp /home/${user}/PATH-TO/.face /var/lib/AccountsService/icons/${user}
@@ -61,6 +74,5 @@
 
     chown root:root /var/lib/AccountsService/icons/${config.clan.user-password.user}
     chmod      0444 /var/lib/AccountsService/icons/${config.clan.user-password.user}
-'';
-
+  '';
 }
