@@ -58,12 +58,6 @@
       pkgsForSystem = import ./nixpkgs.nix inputs;
       specialArgs = {inherit inputs self;};
       meta.name = "Lehmanator";
-      machines = {
-        wyse = {imports = [./modules/shared.nix ./machines/wyse/configuration.nix];};
-        aio = {imports = [./modules/shared.nix ./machines/aio/configuration.nix];};
-        fw = {imports = [./modules/shared.nix ./machines/fw/configuration.nix];};
-      };
-
       # Inventory Docs:
       # - https://docs.clan.lol/guides/inventory/
       # - https://docs.clan.lol/reference/nix-api/inventory/
@@ -78,22 +72,22 @@
           fw = {
             name = "fw";
             description = "Framework Laptop 13";
-            icon = "./machines/fw/icon.svg";
+            icon = ./machines/fw/icon.svg;
             tags = ["all" "laptop" "nvme" "wifi"];
             deploy.targetHost = "root@fw.local";
           };
           wyse = {
             name = "wyse";
             description = "Dell Wyse Mini Desktop";
-            icon = "./machines/wyse/icon.svg";
-            tags = ["all" "desktop" "backup" "nvme" "wifi"];
+            icon = ./machines/wyse/icon.svg;
+            tags = ["all" "backup" "desktop" "server" "nvme" "wifi"];
             deploy.targetHost = "root@wyse.local";
           };
           aio = {
             name = "aio";
             description = "Dell Inspiron All-in-One Desktop";
-            icon = "./machines/aio/icon.svg";
-            tags = ["all" "desktop" "hdd" "wifi"];
+            icon = ./machines/aio/icon.svg;
+            tags = ["all" "desktop" "hdd" "server" "wifi"];
             deploy.targetHost = "root@aio.local";
           };
         };
@@ -111,6 +105,24 @@
             };
           };
           disk-id.default.roles.default.tags = ["all"];
+          importer = {
+            base.roles.default = {
+              tags = ["all"];
+              extraModules = [
+                "nixos/suites/base.nix"
+                "nixos/profiles/uefi.nix"
+                "modules/shared.nix"
+              ];
+            };
+            gnome.roles.default = {
+              tags = ["desktop" "laptop"];
+              extraModules = ["nixos/profiles/gnome.nix"];
+            };
+            server.roles.default = {
+              tags = ["server"];
+              extraModules = ["nixos/suites/server.nix"];
+            };
+          };
           iwd.default.roles.default = {
             tags = ["wifi"];
             config.networks = {

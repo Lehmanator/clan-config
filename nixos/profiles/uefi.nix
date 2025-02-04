@@ -1,33 +1,26 @@
-{ inputs, ... }:
-{ config, lib, pkgs, ... }:
 {
+  inputs,
+  config,
+  ...
+}: {
   imports = [
     inputs.lanzaboote.nixosModules.lanzaboote
+    inputs.self.nixosProfiles.plymouth
     # (inputs.self + "/machines/" + config.networking.hostName + "/disko.nix")
   ];
 
   services.fwupd.enable = true;
 
-  boot = {
-    plymouth.enable = true;
-
-    # Silent Boot
-    consoleLogLevel = 0;
-    initrd.verbose = false;
-    kernelParams = [
-      "quiet"
-      "splash"
-      "boot.shell_on_fail"
-      "loglevel=3"
-      "rd.systemd.show_status=false"
-      "rd.udev.log_level=3"
-      "udev.log_priority=3"
-    ];
-
-    # Hide the OS choice for bootloaders.
-    # It's still possible to open the bootloader list by pressing any key
-    # It will just not appear on screen unless a key is pressed
-    # loader.timeout = 0;
+  boot.loader.systemd-boot.enable = true;
+  boot.initrd.systemd.enable = true;
+  boot.initrd.network = {
+    enable = true;
+    ssh = {
+      enable = true;
+      port = 7172;
+      authorizedKeys = builtins.attrValues config.clan.admin.allowedKeys;
+      hostKeys = ["/var/lib/initrd-ssh-key"];
+    };
   };
-
+  boot.initrd.availableKernelModules = ["xhci_pci"];
 }

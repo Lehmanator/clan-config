@@ -1,49 +1,60 @@
-{ inputs, config, lib, pkgs, ... }:
 {
-  imports = with inputs; [
-    nixos-generators.nixosModules.all-formats
-    ./clanModules-shared.nix
-    inputs.self.nixosProfiles.home-manager
-    inputs.self.nixosProfiles.tailscale
+  inputs,
+  config,
+  lib,
+  ...
+}: {
+  #
+  # NOTE: This file contains config using clanModules shared by all nixosConfigurations.
+  #
+  imports = with inputs.clan-core.clanModules; [
+    localsend # Tags: all | gui ?
+    static-hosts # Tags: all
+    trusted-nix-caches # Tags: all
+    zerotier-static-peers # Tags: all
+    zt-tcp-relay # Tags: all | portable
   ];
 
-  clan.core.deployment.requireExplicitUpdate = lib.mkDefault false;
-
-  # Local service discovery & mDNS
-  services.avahi.enable = true;
+  clan = let
+    networkId = builtins.readFile "${config.clan.core.settings.directory}/machines/wyse/facts/zerotier-network-id";
+  in {
+    core.deployment.requireExplicitUpdate = lib.mkDefault false;
+    core.networking.zerotier.networkId = networkId;
+    localsend = {
+      # displayName = config.networking.hostName;
+      ipv4Addr = "192.168.56.2/24";
+    };
+    static-hosts = {
+      topLevelDomain = "lehman.run";
+      excludeHosts = ["nixos"];
+    };
+    zt-tcp-relay.port = 4443;
+    zerotier-static-peers = {
+      networkIds = [networkId];
+      networkIps = lib.unique (builtins.filter (i: i != null && i != "") (lib.mapAttrsToList (
+          _: v: v.config.clan.core.facts.services.zerotier.public.zerotier-ip.value or null
+        )
+        inputs.self.nixosConfigurations));
+    };
+  };
 
   # After system installed/deployed use:
   # $ clan secrets get {machine_name}-user-password
-  users = {
-    groups = {
-      admins  = {};
-      users   = { gid = 100; };
-      ${config.clan.user-password.user} = { gid = 1000; };
-    };
-    users.${config.clan.user-password.user} = {
-      group = config.clan.user-password.user;
-      isNormalUser = true;
-      extraGroups = ["wheel" "admins" "users"];
-      openssh.authorizedKeys.keys = (builtins.attrValues config.clan.admin.allowedKeys) ++ [
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCo3Q3odpbDCcOxKeiqE5YX4sWmSGynXz3Nog0IuQbPfj8/4bCaeQMPMYggu7Txj9Q935teDi0C6mLkeprn5Q0vsZwglX/lAXaMEv3QgnzPzIxple0Ns7buyaIP38JNAHCd6qNMpLXsWU1CrKkX9qOY3CSzb127xMY9IemW2GzIUD8v3SCrmUoEJg3cqZJ3zK21V3SbSyAwf1EJT/jfggksC7gSMOmvkFPJ/8E1L/J7l/+yplS+4cmFoznbVgIyp49Vl6SGE+jay4yc/BAxzmx+x3tPn4zLeZVRswmx6sRZZXY+U+jKeZ5/0HFETtz87rW4cXW95531wpsVufu8M8eqvdOGVIR1a3HYaM82I7Enm95lKXuyoijwYlsVQP+DTWHtzpXNHZekSQjpmlR31pHyF/h7nON2DzCwcdrz+NOvXmQgighXvuwWVF0MmZCHJDJYS4P/RDG2HKztuqxiH5dxYCWyVIcYuS2awHXb+zhOFPi+UvhezgJPMU1gX+djXZGorN87HditBLfFmMckmT1MCU0jzenn4boPE25j5TXRCRCXTI9TMFOgzOS87amE/w8cUFK2WQiIa60SLkNdHy8k4W0aQfjGxEL9ijsB+JKpzgKFOv0EKIBYY8Z4i822RvZ9L7WCDK0BQe0jmkwp0ZUDnST2XY3NMqprVZNHFWKz7w== ${config.clan.user-password.user}@fw"
-      ];
-    };
+  users.groups.admins.members = [config.clan.user-password.user];
+  users.groups.users = {
+    members = [config.clan.user-password.user];
+    gid = 100;
+  };
+  users.groups.${config.clan.user-password.user} = {
+    members = [config.clan.user-password.user];
+    gid = 1000;
+  };
+  users.users.${config.clan.user-password.user} = {
+    group = config.clan.user-password.user;
+    extraGroups = ["wheel"];
+    uid = 1000;
+    openssh.authorizedKeys.keys = config.users.users.root.openssh.authorizedKeys.keys;
   };
 
-  # TODO: Map using nixosConfigurations
-  programs.ssh.knownHosts = with inputs.self.nixosConfigurations; {
-     aio.publicKeyFile =  aio.config.clan.core.facts.services.openssh.public."ssh.id_ed25519.pub".path;
-      fw.publicKeyFile =   fw.config.clan.core.facts.services.openssh.public."ssh.id_ed25519.pub".path;
-    wyse.publicKeyFile = wyse.config.clan.core.facts.services.openssh.public."ssh.id_ed25519.pub".path;
-  };
-
-  # See: https://jade.fyi/blog/finding-functions-in-nixpkgs/
-  # TODO: Create separate module/profile for Nix docs
-  nix.package = pkgs.lix;
-  nix.settings.experimental-features = ["nix-command" "flakes" "repl-flake"];
-  environment.systemPackages = [
-    pkgs.manix    # Util to search Nix docs
-    pkgs.nix-doc  # Nix plugin for getting docs on Nix libs
-    pkgs.nixdoc   # Gen reference docs for Nix libs
-  ];
+  programs.ssh.knownHostsFiles = builtins.attrValues (builtins.mapAttrs (n: v: v.config.clan.core.vars.generators.openssh.files."ssh.id_ed25519.pub".path) (builtins.removeAttrs inputs.self.nixosConfigurations ["clan-installer"]));
 }

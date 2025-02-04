@@ -1,13 +1,7 @@
-{
-  inputs,
-  config,
-  ...
-}: {
+{config, ...}: {
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
-    inputs.self.nixosProfiles.gnome
-    inputs.self.nixosProfiles.uefi
     # inputs.self.nixosProfiles.displaylink
   ];
 
@@ -26,7 +20,6 @@
   # - https://github.com/nix-community/disko/blob/master/example/luks-interactive-login.nix
   # - https://github.com/nix-community/disko/blob/master/example/luks-lvm.nix
   # ssh root@flash-installer.local lsblk --output NAME,ID-LINK,FSTYPE,SIZE,MOUNTPOINT
-  disko.devices.disk.main.device = "/dev/disk/by-id/nvme-eui.0025385821413a6b";
 
   # This machine has an old Windows disk connected.
   #  so we'll temporarily allow using NTFS partitions at boot.

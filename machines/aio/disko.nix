@@ -1,5 +1,4 @@
-{ lib, ... }: 
-let
+{lib, ...}: let
   inherit (lib) mkDefault mkIf;
 
   # How many GB of RAM the machine has.
@@ -22,13 +21,10 @@ let
 
   # Backend storage mechanism for systemd-homed
   homed-storage = "luks"; # directory | subvolume | fscrypt | cifs | luks
-
-in
-{
+in {
   disko.devices = {
     disk.main = {
       type = "disk";
-      # device = <uuid>;  # Set in `flake.nix` for each machine
       content = {
         type = "gpt";
         partitions = {
@@ -58,11 +54,11 @@ in
               # for example use `echo -n "password" > /tmp/secret.key`
               # passwordFile = mkIf interactive "/tmp/secret.key";
               # passwordFile = config.sops.secrets.fw-user-password.path;
+              # additionalKeyFiles = ["/tmp/additionalSecret.key"];
               settings = {
                 # keyFile = mkIf (! interactive) "/tmp/secret.key";
                 allowDiscards = true;
               };
-              # additionalKeyFiles = ["/tmp/additionalSecret.key"];
               content = {
                 type = "lvm_pv";
                 vg = "pool";
@@ -129,7 +125,11 @@ in
       };
     };
 
-    nodev.${if tmpfs then "/" else "/tmp"} = {
+    nodev.${
+      if tmpfs
+      then "/"
+      else "/tmp"
+    } = {
       fsType = "tmpfs";
       mountOptions = [
         "size=${builtins.toString (ram / 8)}G"
@@ -143,13 +143,12 @@ in
 
   # TODO: Handle XBOOTLDR
   boot.loader.grub = {
-    efiSupport            = mkDefault true;
+    efiSupport = mkDefault true;
     efiInstallAsRemovable = mkDefault true;
   };
 
   services = {
-    nscd.enable    = homed;  # Required by:    systemd-homed
-    userdbd.enable = homed;  # Recommended by: systemd-homed
+    nscd.enable = homed; # Required by:    systemd-homed
+    userdbd.enable = homed; # Recommended by: systemd-homed
   };
-  
 }
