@@ -120,6 +120,10 @@
           };
           machine-id.instance_1.roles.default.tags = ["all"];
           state-version.instance_1.roles.default.tags = ["all"];
+          user-password.instance_1.roles.default = {
+            tags = ["all"];
+            config.user = "sam";
+          };
         };
       };
     };
