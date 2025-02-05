@@ -160,6 +160,31 @@
             tags = ["all"];
             config.user = "sam";
           };
+          zerotier.default = {
+            roles = {
+              controller.machines = ["wyse"];
+              peer = {
+                tags = ["all"];
+                config = {
+                  excludeHosts = ["nixos"];
+                  networkIds = [];
+                  networkIps = [
+                    "192.168.1.2"
+                    "192.168.1.30"
+                  ];
+                };
+              };
+              moon = {
+                tags = ["server"];
+                # Make this machine a moon.
+                # Other machines can join this moon by adding this moon in their config.
+                config.moon.stableEndpoints = ["1.2.3.4" "10.0.0.3/9993" "2001:abcd:abcd::3/9993"];
+              };
+            };
+            extraModules = [
+              "modules/zerotier.nix"
+            ];
+          };
         };
       };
     };

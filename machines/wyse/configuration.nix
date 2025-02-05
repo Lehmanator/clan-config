@@ -1,13 +1,5 @@
-{config, ...}: {
+{...}: {
   clan.localsend.ipv4Addr = "192.168.56.2/24";
-  clan.core.networking.zerotier = {
-    controller = {
-      enable = true;
-      public = false;
-    };
-    networkId = builtins.readFile "${config.clan.core.settings.directory}/machines/${config.networking.hostName}/facts/zerotier-network-id";
-    # moon.stableEndpoints = [ "home" ];
-  };
 
   # TODO: Combine LVM, LUKS, BTRFS, interactive login, impermanence
   # - https://github.com/nix-community/disko/blob/master/example/luks-btrfs-subvolumes.nix
@@ -20,10 +12,10 @@
   # https://wiki.nixos.org/wiki/NTFS
   # https://nixos.wiki/wiki/NTFS
   # TODO: Make sure this is correct.
+  boot.supportedFilesystems = ["ntfs"];
   # fileSystems."/mnt/hybrid-drive-750GB" = {
   #   device = "/dev/sda1";
   #   fsType = "ntfs-3g";
   #   options = ["rw" "uid=1000"];
   # };
-  boot.supportedFilesystems = ["ntfs"];
 }
